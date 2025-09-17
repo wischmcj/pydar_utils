@@ -1,12 +1,13 @@
 # pydar_utils: Python Quantitative Structural Modeling for TLS LiDAR Data
 
-pydar_utils is a Python library for processing Terrestrial Laser Scanning (TLS) LiDAR point clouds and generating Quantitative Structural Models (QSM) of trees. The library provides comprehensive tools for tree isolation, structural analysis, and 3D reconstruction from point cloud data.
+pydar_utils is a Python library for processing Terrestrial Laser Scanning (TLS) LiDAR point clouds and extracting information regarding tree structural traits from trees found in said scans. The library provides comprehensive tools for tree isolation, structural trait estimation, and 3D surface-reconstruction from point cloud data.
 
 ## Overview
 
-pydar_utils focuses on two primary use cases:
-1. **Tree Isolation**: Separating individual trees from surrounding man-made objects and other vegetation
-2. **Tree Segmentation**: Isolating and analyzing different parts of trees (trunk, branches, leaves) for structural modeling
+pydar_utils focuses on three primary use cases:
+1. **Tree Isolation**: Separating individual trees from surrounding man-made objects and other vegetation.
+2. **Epiphyte Segmentation**: Isolating and analyzing different parts of trees (trunk, branches, leaves) as well as plants in and around the trees.
+3. **Ray Casting Similations**: Creation of 3D meshes representing objects and examining their characteristics via tensor intersection calculations.
 
 ## Key Features
 
