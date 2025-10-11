@@ -1,7 +1,10 @@
 pydar_utils
-===========
+=====
 
 .. toctree::
    :maxdepth: 4
 
-   pydar_utils
+   canopy_metrics
+   qsm_generation
+   set_config
+   tree_isolation
