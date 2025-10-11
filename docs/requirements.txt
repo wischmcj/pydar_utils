@@ -1,4 +1,4 @@
-./pydar_utils
+pydar_utils @ git+https://github.com/wischmcj/pydar_utils@main
 geopandas
 matplotlib==3.9.0
 myst-parser
