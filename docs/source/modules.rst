@@ -6,5 +6,4 @@ pydar-utils
 
    canopy_metrics
    qsm_generation
-   set_config
    tree_isolation
