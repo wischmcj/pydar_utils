@@ -8,6 +8,8 @@ import os
 import sys
 package_path = os.path.abspath('../../')
 sys.path.insert(0, package_path)
+package_path = os.path.abspath('../../pydar-utils')
+sys.path.insert(0, package_path)
 print('############### ', package_path)
 my_path =  os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))+'/pydar-utils/'
 sys.path.insert(0,my_path)
