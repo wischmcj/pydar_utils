@@ -6,14 +6,17 @@
 from __future__ import annotations
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../pydar_utils'))
-sys.path.insert(0, os.path.abspath('../pydar_utils'))
+package_path = os.path.abspath('../../')
+sys.path.insert(0, package_path)
+print('############### ', package_path)
+my_path =  os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))+'/pydar_utils/'
+sys.path.insert(0,my_path)
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 project = "pydar_utils"
 copyright = "2024, Collin Wischmeyer"
-authors = "Collin Wischmeyer, Travis Swanson, John Van Stan"
+authors = "Collin Wischmeyer"
 release = "0.1.1"
 
 # -- General configuration ---------------------------------------------------
