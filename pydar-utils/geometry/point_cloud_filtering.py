@@ -4,15 +4,9 @@ import numpy as np
 import open3d as o3d
 from set_config import config, log
 
-
-def center_and_rotate(pcd, center=None):
-    center = pcd.get_center() if center is None else center
-    rot_90_x = np.array([[1,0,0],[0,0,-1],[0,1,0]])
-    pcd.translate(np.array([-x for x in center ]))
-    pcd.rotate(rot_90_x)
-    pcd.rotate(rot_90_x)
-    pcd.rotate(rot_90_x)
-    return center
+from math_utils.general import (
+    get_angles,
+)
 
 def zoom_pcd(zoom_region,
             pcd, 
@@ -163,3 +157,52 @@ def filter_pcd_list(pcds,
                             )[0]
     return  pcds[to_keep_cluster_ids]
     # for idc in small_clusters: clusters[int(idc)].paint_uniform_color([1,0,0])
+
+def bounding_box(points, min_x=-np.inf, max_x=np.inf, min_y=-np.inf,
+                        max_y=np.inf, min_z=-np.inf, max_z=np.inf):
+    """ex: 
+    in_cond = bounding_box(pts, min_x=ll[0], max_x=ur[0], min_y=ll[1], max_y=ur[1], min_z=ll[2], max_z=ur[2])
+    """
+    bound_x = np.logical_and(points[:, 0] > min_x, points[:, 0] < max_x)
+    bound_y = np.logical_and(points[:, 1] > min_y, points[:, 1] < max_y)
+    bound_z = np.logical_and(points[:, 2] > min_z, points[:, 2] < max_z)
+
+    bb_filter = np.logical_and(np.logical_and(bound_x, bound_y), bound_z)
+
+    return bb_filter
+
+def filter_by_bb(pcd, exclude_boundaries, reverse_filter):
+    filtered_chunk_data= []
+    points = np.array(pcd.points)
+    new_chunk_data=points
+    if exclude_boundaries is not None:
+        for boundary in exclude_boundaries:
+            (x_min, y_min, z_min), (x_max, y_max, z_max) = boundary
+            print('getting mask for boundary')
+            mask = bounding_box(points, min_x=x_min, max_x=x_max, min_y=y_min, max_y=y_max, min_z=z_min, max_z=z_max)
+            
+            print(f'filtering')
+            if len(new_chunk_data) > 0:
+                if reverse_filter: # exclude all points within the boundaries
+                    new_chunk_data = new_chunk_data[~mask]
+                else: # only include points within the boundaries (the union, if multiple)
+                    filtered_chunk_data.append(new_chunk_data[mask])
+
+    if not reverse_filter:
+        new_chunk_data = np.vstack(filtered_chunk_data)
+    
+    return new_chunk_data
+
+
+
+def filter_by_norm(pcd, angle_thresh=10, rev = False):
+    norms = np.asarray(pcd.normals)
+    angles = np.apply_along_axis(get_angles, 1, norms)
+    angles = np.degrees(angles)
+    log.info(f"{angle_thresh=}")
+    if rev:
+        stem_idxs = np.where((angles < -angle_thresh) | (angles > angle_thresh))[0]
+    else:
+        stem_idxs = np.where((angles > -angle_thresh) & (angles < angle_thresh))[0]
+    stem_cloud = pcd.select_by_index(stem_idxs)
+    return stem_cloud

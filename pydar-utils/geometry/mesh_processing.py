@@ -8,6 +8,12 @@ import matplotlib.pyplot as plt
 from numpy import array as arr
 
 
+def get_ball_mesh(pcd,radii= [0.005, 0.01, 0.02, 0.04]):
+    rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
+        pcd, o3d.utility.DoubleVector(radii)
+    )
+    return rec_mesh
+
 def edges_to_lineset(mesh,edges, color):
 
     """

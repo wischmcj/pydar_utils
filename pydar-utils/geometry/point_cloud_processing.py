@@ -6,7 +6,7 @@ from glob import glob
 
 import sys
 import os
-sys.path.insert(0,'/media/penguaman/code/ActualCode/Research/pydar-utils/pydar-utils/')
+sys.path.insert(0,'/media/penguaman/code/ActualCode/Research/pyQSM/pyQSM/')
 from math_utils.general import (
     get_angles,
     get_center,
@@ -20,28 +20,74 @@ from set_config import log, config
 
 from viz.viz_utils import color_continuous_map, draw
 
+# subsample data with voxel_size
+def voxelize_and_trace(data, voxel_size):
+    """
+    Voxelizes np.array data and preserves the non-point and color data if present
+    """
+    points = data[:, :3]
+    points = np.round(points, 2)
+    if data.shape[1] >= 4:
+        other = data[:, 3:]
+
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(points)
+    bound = np.max(np.abs(points)) + 100
+    min_bound, max_bound = np.array([-bound, -bound, -bound]), np.array([bound, bound, bound])
+    downpcd, _, idx = pcd.voxel_down_sample_and_trace(voxel_size, min_bound, max_bound)
+
+    if data.shape[1] >= 4:
+        idx_keep = [item[0] for item in idx]
+        other = other[idx_keep]
+        data = np.hstack((np.asarray(downpcd.points), other))
+    else:
+        data = np.asarray(downpcd.points)
+    
+    return data, idx
+
+def recover_from_trace(orig_data, map_idxs, filtered_idxs):
+    """
+    Recover elements from orig_data whose ids in map_idxs map to ids in filtered_idxs.
+
+    Args:
+        orig_data (np.ndarray): The original data array.
+        map_idxs (list or np.ndarray): Each element is a list or iterable, where the first element is the target id and others are indices from orig_data that map to that id.
+        filtered_idxs (list or np.ndarray): List of ids to select in the first element of each map_idxs group.
+
+    Returns:
+        np.ndarray: Filtered rows from orig_data whose ids map to those in filtered_idxs.
+        np.ndarray: The corresponding indices (from orig_data) used for selection.
+    """
+    # Create a set for fast lookup
+    filtered_set = set(filtered_idxs)
+    map_idxs = np.array(map_idxs)
+
+    filtered_mapee_lists = map_idxs[np.isin(map_idxs[:,0], filtered_set)]
+    filtered_mapees = np.array(filtered_mapee_lists).flatten()
+    
+    selected_indices = np.array(selected_indices)
+    recovered = orig_data[selected_indices]
+    return recovered, selected_indices
+
+    
 def join_pcd_files(files_path, pattern = '*', 
                     voxel_size = None,
                     write_to_file = True):
     detail_files = glob(pattern,root_dir=files_path)
     pcds=[]
+    joined = None
     for file in detail_files:
         pcd = o3d.io.read_point_cloud(f'{files_path}/{file}')
         print(f'{file} has {len(pcd.points)} points')
         if voxel_size is not None:
             pcd = pcd.voxel_down_sample(voxel_size)
             print(f'{file} has {len(pcd.points)} points after voxel downsampling')
-        pcds.append(pcd)
-
-    joined = join_pcds(pcds)
-    if write_to_file:
-        o3d.io.write_point_cloud(f'{files_path}/joined.pcd', joined[0])
+        if joined is None:
+            joined = pcd
+        else:
+            joined += pcd
+    o3d.io.write_point_cloud(f'{files_path}/joined.pcd', joined[0])
     return joined
-    
-def join_pcds(pcds):
-    pts = [arr(pcd.points) for pcd in pcds]
-    colors = [arr(pcd.colors) for pcd in pcds]
-    return create_one_or_many_pcds(pts, colors, single_pcd=True)
 
 def create_one_or_many_pcds( pts,
                         colors = None,
@@ -177,6 +223,7 @@ def cluster_plus(pcd,
     if from_points:
         pts=pcd
         pcd = o3d.geometry.PointCloud()
+        breakpoint()
         pcd.points = o3d.utility.Vector3dVector(arr(pts))
     
     if ransac:
@@ -217,53 +264,27 @@ def cluster_and_get_largest(pcd,
     max_cluster = pcd.select_by_index(max_cluster_idxs)
     return max_cluster
 
-def orientation_from_norms(norms, samples=10, max_iter=100):
-    """Attempts to find the orientation of a cylindrical point cloud
-    given the normals of the points. Attempts to find <samples> number
-    of vectors that are orthogonal to the normals and then averages
-    the third ortogonal vector (the cylinder axis) to estimate orientation.
-    """
-    sum_of_vectors = [0, 0, 0]
-    found = 0
-    iter_num = 0
-    while found < samples and iter_num < max_iter and len(norms) > 1:
-        iter_num += 1
-        rand_id = np.random.randint(len(norms) - 1)
-        norms, vect = poprow(norms, rand_id)
-        dot_products = abs(np.dot(norms, vect))
-        most_normal_val = min(dot_products)
-        if most_normal_val <= 0.001:
-            idx_of_normal = np.where(dot_products == most_normal_val)[0][0]
-            most_normal = norms[idx_of_normal]
-            approx_axis = np.cross(unit_vector(vect), unit_vector(most_normal))
-            sum_of_vectors += approx_axis
-            found += 1
-    log.info(f"found {found} in {iter_num} iterations")
-    axis_guess = np.asarray(sum_of_vectors) / found
-    return axis_guess
-
-
-def filter_by_norm(pcd, angle_thresh=10, rev = False):
-    norms = np.asarray(pcd.normals)
-    angles = np.apply_along_axis(get_angles, 1, norms)
-    angles = np.degrees(angles)
-    log.info(f"{angle_thresh=}")
-    if rev:
-        stem_idxs = np.where((angles < -angle_thresh) | (angles > angle_thresh))[0]
-    else:
-        stem_idxs = np.where((angles > -angle_thresh) & (angles < angle_thresh))[0]
-    stem_cloud = pcd.select_by_index(stem_idxs)
-    return stem_cloud
-
-
-def get_ball_mesh(pcd,radii= [0.005, 0.01, 0.02, 0.04]):
-    rec_mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
-        pcd, o3d.utility.DoubleVector(radii)
-    )
-    return rec_mesh
-
 
 def get_shape(pts, shape="sphere", as_pts=True, rotate="axis", **kwargs):
+    """
+    Generate a geometric shape (sphere or cylinder) that fits the given points,
+    with options for extracting it as a mesh or as uniformly sampled points.
+
+    Args:
+        pts (array-like): An array of points to determine the location and size of the shape.
+        shape (str): The type of shape to create ("sphere" or "cylinder").
+        as_pts (bool): If True, returns the shape as a point cloud. If False, returns a mesh.
+        rotate (str): Rotation strategy, either "axis" for axis-angle or other for different rotation.
+        **kwargs: Additional parameters:
+            - center: Center of the shape (automatically computed if not provided).
+            - radius: Radius of the shape (automatically computed if not provided).
+            - height: Height for cylinder (required for 'cylinder' shape).
+            - axis: The axis for rotation (optional).
+
+    Returns:
+        open3d.geometry.PointCloud or open3d.geometry.TriangleMesh:
+            The constructed shape as a point cloud or mesh object.
+    """
     if not kwargs.get("center"):
         kwargs["center"] = get_center(pts)
     if not kwargs.get("radius"):
@@ -302,41 +323,3 @@ def get_shape(pts, shape="sphere", as_pts=True, rotate="axis", **kwargs):
         return shape
 
     return shape
-
-def query_via_bnd_box(pcd,
-                        source_pcd,
-                        scale = 1.1,
-                        translation=(0,0,1),
-                        draw:bool = True  ):
-    """Looks for neighbors by scaling/translating a
-        bounded box containing the pcd
-
-    Args:
-        sub_pcd (_type_): _description_
-        pcd (_type_): _description_
-    """
-    from copy import deepcopy
-    # get and shift bounded box around opcd
-    obb = pcd.get_oriented_bounding_box()
-    # obb = pcd.get_minimal_oriented_bounding_box()
-    obb.color = (1, 0, 0)
-    shifted_obb = deepcopy(obb).translate(translation,relative = True)
-    shifted_obb.scale(scale,center = obb.center)
-    if draw: draw([obb,shifted_obb])
-
-    # identify points in src_pcd that at are in the shifted obbb
-    # that are not in pcd 
-    src_pcd_pts = arr(source_pcd.points())
-    shifted_nbrs_idxs = shifted_obb.get_point_indices_within_bounding_box( 
-                                o3d.utility.Vector3dVector(src_pcd_pts) )
-    input_nbrs_idxs = obb.get_point_indices_within_bounding_box( 
-                                o3d.utility.Vector3dVector(src_pcd_pts) )
-    new_nbr_idxs= np.setdiff1d(shifted_nbrs_idxs, input_nbrs_idxs)
-
-    # return set of neighbors not in pcd
-    nbrs_pcd = pcd.select_by_index(shifted_nbrs_idxs)
-    # nn_pts = src_pcd_pts[new_nbr_idxs]
-    nbrs_pcd = pcd.select_by_index(new_nbr_idxs)
-    
-    if draw: draw([pcd,nbrs_pcd,obb,shifted_obb])
-    return nbrs_pcd, new_nbr_idxs
