@@ -22,11 +22,11 @@ from set_config import log
 
 s27d = "s32_downsample_0.04.pcd"
 
-
 def draw_view(pcd=None, suffix=''):
     log.info("Testing camera in open3d ...")
     vis = o3d.visualization.Visualizer()
     vis.create_window()
+    vis.run()
     if pcd is not None:
         vis.add_geometry(pcd)
     try:
@@ -35,7 +35,7 @@ def draw_view(pcd=None, suffix=''):
         vis.get_view_control().convert_from_pinhole_camera_parameters(camera_params)
     except Exception as e:
         log.info(f'view files not found for {suffix}, using default')
-    vis.run()
+    
     ex_branch_view_control = vis.get_view_control()
     ex_branch_camera_params = ex_branch_view_control.convert_to_pinhole_camera_parameters()
     o3d.io.write_pinhole_camera_parameters(f"data/viz_configs/ex_branch_camera_params_{suffix}.json",ex_branch_camera_params)
@@ -61,20 +61,7 @@ def iter_draw(idxs_list, pcd):
     o3d.visualization.draw_geometries(pcds)
     return pcd
 
-def _draw_w_edit_mode(pcds, **kwargs):
-    print("Demo for manual geometry cropping")
-    print(
-        "1) Press 'Y' twice to align geometry with negative direction of y-axis"
-    )
-    print("2) Press 'K' to lock screen and to switch to selection mode")
-    print("3) Drag for rectangle selection,")
-    print("   or use ctrl + left click for polygon selection")
-    print("4) Press 'C' to get a selected geometry")
-    print("5) Press 'S' to save the selected geometry")
-    print("6) Press 'F' to switch to freeview mode")
-    o3d.visualization.draw_geometries_with_editing(pcds, **kwargs)
-
-def draw(pcds, raw=True, side_by_side=False, w_editing=False, **kwargs):
+def draw(pcds, raw=True, side_by_side=False, **kwargs):
     if (not(isinstance(pcds, list))
         and not(isinstance(pcds, np.ndarray))):
         pcds_to_draw = [pcds]
@@ -95,42 +82,10 @@ def draw(pcds, raw=True, side_by_side=False, w_editing=False, **kwargs):
     # tree, Secrest27
     tcoords = o3d.t.geometry.TriangleMesh.create_coordinate_frame()
     tcoords.translate(pcds_to_draw[0].get_center())
-    if w_editing:
-        _draw_w_edit_mode(pcds_to_draw, **kwargs)
-    else:
-        draw_geometries(
-                pcds_to_draw,
-                # mesh_show_wireframe=True,
-                # zoom=0.7,
-                # front=[0, 2, 0],
-                # lookat=[3, -3, 4],
-                # up=[0, -1, 1],
-                **kwargs,
-            )
-
-def vdraw(pcds, 
-          save_file='',
-          point_size=3,
-          line_width = 15,
-          display_time = 60):
-    
-    vis = o3d.visualization.Visualizer()
-    vis.create_window(width=1920, height=1080)
-    for pcd in pcds:
-        vis.add_geometry(pcd)
-
-    ctl = vis.get_view_control()
-    ctl.set_zoom(0.6)
-
-    # Set smaller point size. Default is 5.0
-    vis.get_render_option().point_size = point_size
-    vis.get_render_option().line_width = 15
-    vis.get_render_option().light_on = False
-    vis.get_render_option().mesh_show_back_face = True
-    vis.update_renderer()
-    vis.run()
-    if save_file!='':
-        vis.capture_screen_image(save_file)
+    draw_geometries(
+            pcds_to_draw,
+            **kwargs,
+        )
 
 def color_continuous_map(pcd, cvar):
     if len(cvar)==0:
@@ -306,71 +261,3 @@ def rotating_compare_gif(transient_pcd_in, constant_pcd_in=None,
                     subprocess.call(['rm', f'{filename}'])
             except Exception as e:
                 log.warning(f'Delete failed: {e}')
-            
-# def draw_w_traj(pcd_or_data_path, 
-#                render_option_path= '',
-#                camera_trajectory_path):
-#     draw_w_traj.index = -1
-#     draw_w_traj.trajectory =9
-#     o3d.io.read_pinhole_camera_trajectory(camera_trajectory_path)
-
-#     draw_w_traj.vis = o3d.visualization.Visualizer()
-#     image_path = os.path.join(data_path, 'image')
-
-#     if not os.path.exists(image_path):
-
-#         os.makedirs(image_path)
-
-#     depth_path = os.path.join(test_data_path, 'depth')
-
-#     if not os.path.exists(depth_path):
-
-#         os.makedirs(depth_path)
-
-
-#     def move_forward(vis):
-
-#         # This function is called within the o3d.visualization.Visualizer::run() loop
-#         # The run loop calls the function, then re-render
-#         # So the sequence in this function is to:
-#         # 1. Capture frame
-#         # 2. index++, check ending criteria
-#         # 3. Set camera
-#         # 4. (Re-render)
-#         ctr = vis.get_view_control()
-#         glb = draw_w_traj
-#         if glb.index >= 0:
-#             print("Capture image {:05d}".format(glb.index))
-#             depth = vis.capture_depth_float_buffer(False)
-#             image = vis.capture_screen_float_buffer(False)
-#             plt.imsave(os.path.join(depth_path, '{:05d}.png'.format(glb.index)),
-#                        np.asarray(depth),
-#                        dpi=1)
-#             plt.imsave(os.path.join(image_path, '{:05d}.png'.format(glb.index)),
-#                        np.asarray(image),
-#                        dpi=1)
-#             # vis.capture_depth_image("depth/{:05d}.png".format(glb.index), False)
-#             # vis.capture_screen_image("image/{:05d}.png".format(glb.index), False)
-#         glb.index = glb.index + 1
-#         if glb.index < len(glb.trajectory.parameters):
-#             ctr.convert_from_pinhole_camera_parameters(
-#                 glb.trajectory.parameters[glb.index], allow_arbitrary=True)
-#         else:
-#             draw_w_traj.vis.\
-#                 register_animation_callback(None)
-#         return False
-
-
-#     vis = draw_w_traj+.vis
-
-#     vis.create_window()
-
-#     vis.add_geometry(pcd)
-
-#     vis.get_render_option().load_from_json(render_option_path)
-
-#     vis.register_animation_callback(move_forward)
-
-#     vis.run()
-
-#     vis.destroy_window()
