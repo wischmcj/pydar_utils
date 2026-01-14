@@ -6,7 +6,7 @@ from glob import glob
 
 import sys
 import os
-sys.path.insert(0,'/media/penguaman/code/ActualCode/Research/pyQSM/pyQSM/')
+sys.path.insert(0,'/media/penguaman/code/ActualCode/Research/pydar-utils/pydar-utils/')
 from math_utils.general import (
     get_angles,
     get_center,
