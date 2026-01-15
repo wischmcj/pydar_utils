@@ -4,31 +4,13 @@ import numpy as np
 from numpy import array as arr, mean
 import scipy.spatial as sps
 import  open3d as o3d
-from open3d.io import read_point_cloud as read_pcd, write_point_cloud as write_pcd
-
-from utils.io import load
 from viz.viz_utils import color_continuous_map, draw
-from set_config import log, config
+from set_config import log
 
-
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib import colors   
-import cv2
-from math import floor
 from matplotlib.colors import hsv_to_rgb
 from matplotlib.colors import rgb_to_hsv
 
 
-def cluster_color(pcd,labels):
-    import matplotlib.pyplot as plt
-    max_label = labels.max()
-    colors = plt.get_cmap("tab20")(labels / (max_label if max_label > 0 else 1))
-    colors[labels < 0] = 0
-    orig_colors = np.array(pcd.colors)
-    pcd.colors = o3d.utility.Vector3dVector(colors[:, :3])
-    return pcd, orig_colors
-    
 def homog_colors(pcd):
     """
         Replaces the color of white points with the average color of their neighbors
@@ -139,7 +121,7 @@ def saturate_colors(pcd, min_s=1,sc_func =lambda sc: sc + (1-sc)/3):
     target = pcd
     orig_colors = arr(target.colors)
     log.info(f'Correcting colors')
-    corrected_colors, sc = color_distribution(arr(target.colors),cutoff=cutoff,sc_func =sc_func)
+    corrected_colors, sc = color_distribution(arr(target.colors),min_s=min_s,sc_func =sc_func)
     target.colors = o3d.utility.Vector3dVector(corrected_colors)
     return target, orig_colors
 
@@ -251,8 +233,8 @@ def isolate_color(in_colors,icolor='white',get_all=True, std='hsv'):
     
     breakpoint()
 
-def color_distribution(in_colors,oth_colors=None,cutoff=.01,elev=40, azim=110, roll=0, 
-                space='none',min_s=.2,sat_correction=2,sc_func =lambda sc: sc + (1-sc)/3):
+def color_distribution(in_colors,oth_colors=None,cutoff=1,elev=40, azim=110, roll=0, 
+                space='none',min_s=.2,sc_func =lambda sc: sc + (1-sc)/3):
     
     color_lists = [in_colors]
     if oth_colors is not None:

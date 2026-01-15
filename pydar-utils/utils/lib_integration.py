@@ -3,11 +3,11 @@ import open3d as o3d
 import numpy as np
 from numpy import asarray as arr
 import scipy.spatial as sps
-from matplotlib import pyplot as plt, patches
+from matplotlib import pyplot as plt
 
 from set_config import config, log
 from math_utils.general import get_center, get_radius, get_percentile
-from viz.viz_utils import iter_draw, draw
+from viz.viz_utils import draw
 
 ## Numpy
 
@@ -25,24 +25,6 @@ def pts_to_cloud(points:np.ndarray, colors = None):
     pcd.points = o3d.utility.Vector3dVector(points)
     pcd.colors = o3d.utility.Vector3dVector(colors)
     return pcd
-
-## SciPy spatial 
-
-def sps_hull_to_mesh(voxel_down_pcd, type="ConvexHull"):
-    mesh = o3d.geometry.TriangleMesh()
-    three_dv = o3d.utility.Vector3dVector
-    three_di = o3d.utility.Vector3iVector
-
-    points = np.asarray(voxel_down_pcd.points)
-    if type != "ConvexHull":
-        test = sps.Delaunay(points)
-    else:
-        test = sps.ConvexHull(points)
-    verts = three_dv(points)
-    tris = three_di(np.array(test.simplices[:, 0:3]))
-    mesh = o3d.geometry.TriangleMesh(verts, tris)
-    # o3d.visualization.draw_geometries([mesh])
-    return mesh
 
 ### KDTrees
 def get_pairs(query_pts=None, kd_tree=None, radius=.2, return_line_set=False):
@@ -126,32 +108,7 @@ def find_neighbors_in_ball(
     sphere =  o3d.geometry.TriangleMesh.create_sphere(radius=radius)
     sphere.translate(center)
     if draw_results:
-        # sphere_pts=sphere.sample_points_uniformly(500)
-        # sphere_pts.paint_uniform_color([0,1,0])
-        # sphere_pts = np.array(sphere_pts.points)
-        # ax.plot(sphere_pts[:,0], sphere_pts[:,1], sphere_pts[:,2], 'o')
-        # plt.show()
         test = o3d.geometry.PointCloud()
         test.points = o3d.utility.Vector3dVector(base_pts)
         draw([sphere, test])
     return sphere, neighbors, center, radius
-
-## Matplotlib
-
-def plot_squares(extents= None,
-                    lls_urs = None):
-    if not lls_urs and not extents:
-        raise ValueError('No range input provided ')
-    fig, ax = plt.subplots()
-    if not lls_urs:
-        bounds = [((x_min,y_min),x_max-x_min, y_max-y_min ) for ((x_min, y_min,_), ( x_max, y_max,_)) in extents.values() ]
-    else: 
-        bounds = lls_urs
-    g_x_min = col_min[0]
-    g_x_max = col_max[0]
-    g_y_min = col_min[1]
-    g_y_max = col_max[1]
-    plt.xlim(g_x_min - 1, g_x_max + 2)
-    plt.ylim(g_y_min - 1, g_y_max + 2)
-    for ll, ur in safe_grid: ax.add_patch(patches.Rectangle(ll, ur[0] - ll[0], ur[1] - ll[1], linewidth=1, edgecolor='black', facecolor='none'))
-    plt.show()

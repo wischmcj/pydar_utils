@@ -1,21 +1,11 @@
-# import open3d as o3d
 import copy
-# import scipy.spatial as sps
-# import matplotlib.colors as mcolors
-# import matplotlib.pyplot as plt
 import numpy as np
 import open3d as o3d
-import scipy.cluster as spc
-from sklearn.metrics import silhouette_score
-# from sklearn.metrics import calinski_harabasz_score
-# from sklearn.metrics import davies_bouldin_score
-from sklearn.cluster import DBSCAN, KMeans
+from sklearn.cluster import  KMeans
 import pyransac3d as pyrsc
-from matplotlib import pyplot as plt
 
-from geometry.point_cloud_processing import get_shape
 from set_config import config, log
-from math_utils.general import (get_radius, 
+from .general import (get_radius, 
                     get_center, 
                     rotation_matrix_from_arr,
                     unit_vector)
@@ -34,8 +24,6 @@ def z_align_and_fit(pcd, axis_guess, **kwargs):
     pcd_r.rotate(R_to_z)
     # approx via circle
     mesh, _, inliers, fit_radius, _ = fit_shape_RANSAC(pcd=pcd_r, **kwargs)
-    # Rotate mesh and pcd back to original orientation'
-    # pcd.rotate(R_from_z)
     if mesh is None:
         log.warning('No mesh found')
         return mesh, _, inliers, fit_radius, _
@@ -50,39 +38,33 @@ def cluster_2d(pcd,axis,eps,min_points):
     new_pcd_pts = copy.deepcopy(pcd_pts) 
     new_pcd_pts[:,axis] = np.zeros_like(pcd_pts[:,axis])
     pcd.points = o3d.utility.Vector3dVector(new_pcd_pts)
-    labels = cluster_and_draw(pcd, eps=eps, min_points=min_points)
-    pcd.points = o3d.utility.Vector3dVector(pcd_pts)
-    draw([pcd])
+    labels = np.array(pcd.cluster_dbscan(eps=eps, min_points=min_points,print_progress=True))
     return labels
 
-def choose_and_cluster(new_neighbors, main_pts, cluster_type, debug=False):
+def orientation_from_norms(norms, samples=10, max_iter=100):
+    """Attempts to find the orientation of a cylindrical point cloud
+    given the normals of the points. Attempts to find <samples> number
+    of vectors that are orthogonal to the normals and then averages
+    the third ortogonal vector (the cylinder axis) to estimate orientation.
     """
-    Determines the appropriate clustering algorithm to use
-    and returns the result of said algorithm
-    """
-    returned_clusters = []
-    nn_points = main_pts[new_neighbors]
-    if cluster_type == "kmeans":
-        # in these cases we expect the previous branch
-        #     has split into several new branches. Kmeans is
-        #     better at characterizing this structure
-        log.info("clustering via kmeans")
-        labels, returned_clusters = kmeans(nn_points, 1)
-        if debug:
-            labels = [idx for idx,_ in enumerate(returned_clusters)]
-            ax = plt.figure().add_subplot(projection='3d')
-            for cluster in returned_clusters: 
-                ax.scatter(nn_points[cluster][:,0], nn_points[cluster][:,1], nn_points[cluster][:,2], 'r')
-            plt.show()
-    if cluster_type != "kmeans" or len(returned_clusters) < 2:
-        log.info("clustering via DBSCAN")
-        labels, returned_clusters, noise = cluster_DBSCAN(
-            new_neighbors,
-            nn_points,
-            eps=config['dbscan']["epsilon"],
-            min_pts=config['dbscan']["min_neighbors"],
-        )
-    return labels, returned_clusters
+    sum_of_vectors = [0, 0, 0]
+    found = 0
+    iter_num = 0
+    while found < samples and iter_num < max_iter and len(norms) > 1:
+        iter_num += 1
+        rand_id = np.random.randint(len(norms) - 1)
+        norms, vect = poprow(norms, rand_id)
+        dot_products = abs(np.dot(norms, vect))
+        most_normal_val = min(dot_products)
+        if most_normal_val <= 0.001:
+            idx_of_normal = np.where(dot_products == most_normal_val)[0][0]
+            most_normal = norms[idx_of_normal]
+            approx_axis = np.cross(unit_vector(vect), unit_vector(most_normal))
+            sum_of_vectors += approx_axis
+            found += 1
+    log.info(f"found {found} in {iter_num} iterations")
+    axis_guess = np.asarray(sum_of_vectors) / found
+    return axis_guess
 
 def evaluate_orientation(pcd):
     """
@@ -99,64 +81,6 @@ def evaluate_orientation(pcd):
     axis_guess = orientation_from_norms(norms, samples=100, max_iter=1000)
     return axis_guess
 
-def z_align_and_fit(pcd, axis_guess, **kwargs):
-    """
-        Attempts to fit a cylinder to a point cloud.
-        Reduces dimensionality (3d->2d) by estimating the 
-            axis of said cylinder, rotating the point cloud and
-            fitting its 2D projection with a circle.
-    """
-    R_to_z = rotation_matrix_from_arr(unit_vector(axis_guess), [0, 0, 1])
-    R_from_z = rotation_matrix_from_arr([0, 0, 1], unit_vector(axis_guess))
-    # align with z-axis
-    pcd_r = copy.deepcopy(pcd)
-    pcd_r.rotate(R_to_z)
-    # approx via circle
-    mesh, _, inliers, fit_radius, _ = fit_shape_RANSAC(pcd=pcd_r, **kwargs)
-    # Rotate mesh and pcd back to original orientation'
-    # pcd.rotate(R_from_z)
-    if mesh is None:
-        # draw([pcd])
-        return mesh, _, inliers, fit_radius, _
-    mesh_pts = mesh.sample_points_uniformly(1000)
-    mesh_pts.paint_uniform_color([0, 1.0, 0])
-    mesh_pts.rotate(R_from_z)
-    draw([mesh_pts, pcd])
-    return mesh, _, inliers, fit_radius, _
-
-## I beleive that the below function needs some work
-##  and may eventually be removed entirely
-# def choose_and_cluster(new_neighbors, main_pts, cluster_type):
-#     """
-#     Determines the appropriate clustering algorithm to use
-#     and returns the result of said algorithm
-#     """
-#     returned_clusters = []
-#     try:
-#         nn_points = main_pts[new_neighbors]
-#     except Exception as e:
-#         breakpoint()
-#         print(f"error in choose_and_cluster {e}")
-#     if cluster_type == "kmeans":
-#         # in these cases we expect the previous branch
-#         #     has split into several new branches. Kmeans is
-#         #     better at characterizing this structure
-#         print("clustering via kmeans")
-#         labels, returned_clusters = kmeans(nn_points, 1)
-#         # labels = [idx for idx,_ in enumerate(returned_clusters)]
-#         # ax = plt.figure().add_subplot(projection='3d')
-#         # for cluster in returned_clusters: ax.scatter(nn_points[cluster][:,0], nn_points[cluster][:,1], nn_points[cluster][:,2], 'r')
-#         # plt.show()
-#     if cluster_type != "kmeans" or len(returned_clusters) < 2:
-#         print("clustering via DBSCAN")
-#         labels, returned_clusters, noise = cluster_DBSCAN(
-#             new_neighbors,
-#             nn_points,
-#             eps=config['dbscan']["epsilon"],
-#             min_pts=config['dbscan']["min_neighbors"],
-#         )
-#     return labels, returned_clusters
-
 def kmeans_feature(smoothed_feature, pcd= None):
     kmeans = KMeans(n_clusters=2, random_state=0, n_init="auto").fit(smoothed_feature[:,np.newaxis])
     unique_vals, counts = np.unique(kmeans.labels_, return_counts=True)
@@ -164,91 +88,6 @@ def kmeans_feature(smoothed_feature, pcd= None):
     cluster_idxs = [np.where(kmeans.labels_==val)[0] for val in unique_vals]
     cluster_features = [smoothed_feature[idxs] for idxs in cluster_idxs]
     return cluster_idxs, cluster_features
-
-def kmeans(points, min_clusters):
-    """
-    https://www.comet.com/site/blog/how-to-evaluate-clustering-models-in-python/
-    """
-    # ch_max = 50
-    clusters_to_try = [
-        min_clusters,
-        min_clusters + 1,
-        min_clusters + 2,
-        min_clusters + 3,
-    ]
-    codes, book = None, None
-    pts_2d = points[:, :2]
-    best_score = 0.4
-    best = None
-    for num in clusters_to_try:
-        log.info(f"trying {num} clusters")
-        if num > 0:
-            codes, book = spc.vq.kmeans2(pts_2d, num)
-            cluster_sizes = np.bincount(book)
-            if num == 1:
-                best = book
-            else:
-                try:
-                    sh_score = silhouette_score(points, book)
-                except ValueError as err:
-                    log.info(f"Error in silhouette_score {err}")
-                    sh_score = 0
-                # ch_score = calinski_harabasz_score(points,book)
-                # db_score = davies_bouldin_score(points,book)
-                # log.info(f'''num clusters: {num}, sizes: {cluster_sizes},
-                #              sh_score: {sh_score}, ch_score: {ch_score}, db_score: {db_score}''')
-                # results.append(((codes,book,num),[sh_score,ch_score,db_score]))
-                if sh_score > best_score:
-                    best = book
-    cluster_idxs = []
-    labels = []
-    try:
-        plt.scatter(pts_2d[:, 0], pts_2d[:, 1], c=best)
-        plt.show()
-    except Exception as err:
-        log.info(f"Error in plotting {err}")
-    for i in range(max(best)):
-        ids_group_i = [idx for idx, val in enumerate(best) if val == i]
-        cluster_idxs.append(ids_group_i)
-        labels.append(i)
-    return labels, cluster_idxs
-
-
-def cluster_DBSCAN(pts_idxs, points, eps, min_pts):
-    """
-    Attepts to cluster by finding a minimal set of points
-       s.t. all points in the set are within a distance,
-       epsilon (eps), of at least on point
-    """
-    clustering = DBSCAN(eps=eps, min_samples=min_pts).fit(points)
-    labels = clustering.labels_
-
-    num_clusters = len(set(labels)) - (1 if -1 in labels else 0)
-    num_noise = list(labels).count(-1)
-
-    unique_labels = set(labels)
-    core_samples_mask = np.zeros_like(labels, dtype=bool)
-    core_samples_mask[clustering.core_sample_indices_] = True
-    idxs = []
-    noise = []
-    # converting ids for 'points' to ids
-    #   in main_pcd stored in pts_idxs
-    for k in unique_labels:
-        class_member_mask = labels == k
-        if k == -1:
-            idx_bool = class_member_mask & (core_samples_mask == False)
-            c_pt_idxs = np.where((np.array(idx_bool) == True))
-            noise = pts_idxs[c_pt_idxs]
-        else:
-            idx_bool = class_member_mask & core_samples_mask
-            c_pt_idxs = np.where((np.array(idx_bool) == True))
-            neighbor_idxs = pts_idxs[c_pt_idxs]
-            idxs.append(neighbor_idxs)
-
-    log.info(f"Estimated number of clusters: {num_clusters}")
-    log.info("Estimated number of noise points: %d" % num_noise)
-    return unique_labels, idxs, noise
-
 
 def fit_shape_RANSAC(
     pcd=None,
@@ -337,3 +176,62 @@ def fit_shape_RANSAC(
         in_pcd.paint_uniform_color([0, 1.0, 0])
 
     return cyl_mesh, in_pcd, inliers, fit_radius, axis
+
+def get_shape(pts, shape="sphere", as_pts=True, rotate="axis", **kwargs):
+    """
+    Generate a geometric shape (sphere or cylinder) that fits the given points,
+    with options for extracting it as a mesh or as uniformly sampled points.
+
+    Args:
+        pts (array-like): An array of points to determine the location and size of the shape.
+        shape (str): The type of shape to create ("sphere" or "cylinder").
+        as_pts (bool): If True, returns the shape as a point cloud. If False, returns a mesh.
+        rotate (str): Rotation strategy, either "axis" for axis-angle or other for different rotation.
+        **kwargs: Additional parameters:
+            - center: Center of the shape (automatically computed if not provided).
+            - radius: Radius of the shape (automatically computed if not provided).
+            - height: Height for cylinder (required for 'cylinder' shape).
+            - axis: The axis for rotation (optional).
+
+    Returns:
+        open3d.geometry.PointCloud or open3d.geometry.TriangleMesh:
+            The constructed shape as a point cloud or mesh object.
+    """
+    if not kwargs.get("center"):
+        kwargs["center"] = get_center(pts)
+    if not kwargs.get("radius"):
+
+        kwargs["radius"] = get_radius(pts)
+
+    if shape == "sphere":
+        shape = o3d.geometry.TriangleMesh.create_sphere(radius=kwargs["radius"])
+    elif shape == "cylinder":
+        try:
+            shape = o3d.geometry.TriangleMesh.create_cylinder(
+                radius=kwargs["radius"], height=kwargs["height"]
+            )
+        except Exception as e:
+            breakpoint()
+            log.info(f"error getting cylinder {e}")
+
+    # log.info(f'Starting Translation/Rotation')
+
+    if as_pts:
+        shape = shape.sample_points_uniformly()
+        shape.paint_uniform_color([0, 1.0, 0])
+
+    shape.translate(kwargs["center"])
+    arr = kwargs.get("axis")
+    if arr is not None:
+        vector = unit_vector(arr)
+        log.info(f"rotate vector {arr}")
+        if rotate == "axis":
+            R = shape.get_rotation_matrix_from_axis_angle(kwargs["axis"])
+        else:
+            R = rotation_matrix_from_arr([0, 0, 1], vector)
+        shape.rotate(R, center=kwargs["center"])
+    elif rotate == "axis":
+        log.info("no axis given for rotation, not rotating")
+        return shape
+
+    return shape
