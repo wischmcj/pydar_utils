@@ -4,7 +4,6 @@ on: push
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true
     name: Build distribution 📦
     runs-on: ubuntu-latest
 
@@ -31,7 +30,7 @@ jobs:
   publish-to-pypi:
     name: >-
       Publish Python 🐍 distribution 📦 to PyPI
-    if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
+    # if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
     needs:
     - build
     runs-on: ubuntu-latest
