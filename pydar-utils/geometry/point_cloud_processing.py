@@ -5,14 +5,9 @@ from numpy import array as arr
 from glob import glob
 
 import sys
-import os
 sys.path.insert(0,'/media/penguaman/code/ActualCode/Research/pydar-utils/pydar-utils/')
 from math_utils.general import (
-    get_center,
     get_percentile,
-    get_radius,
-    rotation_matrix_from_arr,
-    unit_vector
 )
 from set_config import log, config
 

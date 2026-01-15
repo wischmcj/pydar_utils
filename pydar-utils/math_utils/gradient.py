@@ -6,7 +6,6 @@ from set_config import log
 from viz.viz_utils import color_continuous_map
 import tqdm
 import scipy.spatial as sps
-from scipy.stats import mode
 
 def get_smoothed_features(all_data, 
                 save_file=None,

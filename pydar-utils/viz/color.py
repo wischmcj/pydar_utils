@@ -4,18 +4,9 @@ import numpy as np
 from numpy import array as arr, mean
 import scipy.spatial as sps
 import  open3d as o3d
-from open3d.io import read_point_cloud as read_pcd, write_point_cloud as write_pcd
-
-from utils.io import load
 from viz.viz_utils import color_continuous_map, draw
-from set_config import log, config
+from set_config import log
 
-
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib import colors   
-import cv2
-from math import floor
 from matplotlib.colors import hsv_to_rgb
 from matplotlib.colors import rgb_to_hsv
 

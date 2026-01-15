@@ -1,5 +1,5 @@
 import numpy as np
-from numpy import array as arr
+from set_config import log
 
 rot_90_y = np.array([[0,1,0],[1,0,0],[0,0,-1]]) # rotates dead on
 rot_90_z = np.array([[0,-1,0],[1,0,0],[0,0,1]]) 
@@ -145,3 +145,13 @@ def get_radius(points, center_type="centroid"):
     xy_center = center[:2]
     r = np.average([np.sqrt(np.sum((xy_pt - xy_center) ** 2)) for xy_pt in xy_pts])
     return r
+
+def filter_by_angle(vectors, angle_thresh=10, rev = False):
+    angles = np.apply_along_axis(get_angles, 1, vectors)
+    angles = np.degrees(angles)
+    log.info(f"{angle_thresh=}")
+    if rev:
+        in_idxs = np.where((angles < -angle_thresh) | (angles > angle_thresh))[0]
+    else:
+        in_idxs = np.where((angles > -angle_thresh) & (angles < angle_thresh))[0]
+    return in_idxs
