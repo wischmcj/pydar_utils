@@ -8,7 +8,6 @@ from open3d.visualization import draw_geometries,draw_geometries_with_editing
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 
-from utils.io import be_root
 import os 
 import time
 from scipy.spatial.transform import Rotation as R
@@ -112,7 +111,6 @@ def rotating_compare_gif(transient_pcd_in, constant_pcd_in=None,
         """
             Creates a GIF comparing two point clouds. 
         """
-        be_root()
 
         output_folder = os.path.join(out_path, 'tmp')
         print(output_folder)

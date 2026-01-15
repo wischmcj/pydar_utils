@@ -92,7 +92,7 @@ def convert_las(file_name, file_dir='', ext='pcd'):
     else: 
         return data
 
-def np_to_o3d(npz_file):
+def np_to_o3d(npz_file, **kwargs):
     data = np.load(npz_file)
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data['points'])
@@ -100,6 +100,7 @@ def np_to_o3d(npz_file):
     if 'colors' in data.files:
         pcd.colors = o3d.utility.Vector3dVector(data['colors']/255)
     return pcd
+    
 
 def to_o3d(coords=None, colors=None, las=None):
     if las is not None:

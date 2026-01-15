@@ -8,13 +8,11 @@ import sys
 import os
 sys.path.insert(0,'/media/penguaman/code/ActualCode/Research/pydar-utils/pydar-utils/')
 from math_utils.general import (
-    get_angles,
     get_center,
     get_percentile,
     get_radius,
     rotation_matrix_from_arr,
-    unit_vector,
-    poprow,
+    unit_vector
 )
 from set_config import log, config
 
@@ -265,61 +263,3 @@ def cluster_and_get_largest(pcd,
     return max_cluster
 
 
-def get_shape(pts, shape="sphere", as_pts=True, rotate="axis", **kwargs):
-    """
-    Generate a geometric shape (sphere or cylinder) that fits the given points,
-    with options for extracting it as a mesh or as uniformly sampled points.
-
-    Args:
-        pts (array-like): An array of points to determine the location and size of the shape.
-        shape (str): The type of shape to create ("sphere" or "cylinder").
-        as_pts (bool): If True, returns the shape as a point cloud. If False, returns a mesh.
-        rotate (str): Rotation strategy, either "axis" for axis-angle or other for different rotation.
-        **kwargs: Additional parameters:
-            - center: Center of the shape (automatically computed if not provided).
-            - radius: Radius of the shape (automatically computed if not provided).
-            - height: Height for cylinder (required for 'cylinder' shape).
-            - axis: The axis for rotation (optional).
-
-    Returns:
-        open3d.geometry.PointCloud or open3d.geometry.TriangleMesh:
-            The constructed shape as a point cloud or mesh object.
-    """
-    if not kwargs.get("center"):
-        kwargs["center"] = get_center(pts)
-    if not kwargs.get("radius"):
-
-        kwargs["radius"] = get_radius(pts)
-
-    if shape == "sphere":
-        shape = o3d.geometry.TriangleMesh.create_sphere(radius=kwargs["radius"])
-    elif shape == "cylinder":
-        try:
-            shape = o3d.geometry.TriangleMesh.create_cylinder(
-                radius=kwargs["radius"], height=kwargs["height"]
-            )
-        except Exception as e:
-            breakpoint()
-            log.info(f"error getting cylinder {e}")
-
-    # log.info(f'Starting Translation/Rotation')
-
-    if as_pts:
-        shape = shape.sample_points_uniformly()
-        shape.paint_uniform_color([0, 1.0, 0])
-
-    shape.translate(kwargs["center"])
-    arr = kwargs.get("axis")
-    if arr is not None:
-        vector = unit_vector(arr)
-        log.info(f"rotate vector {arr}")
-        if rotate == "axis":
-            R = shape.get_rotation_matrix_from_axis_angle(kwargs["axis"])
-        else:
-            R = rotation_matrix_from_arr([0, 0, 1], vector)
-        shape.rotate(R, center=kwargs["center"])
-    elif rotate == "axis":
-        log.info("no axis given for rotation, not rotating")
-        return shape
-
-    return shape

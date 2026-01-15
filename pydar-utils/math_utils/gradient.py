@@ -3,10 +3,9 @@ import numpy as np
 import os
 from collections import defaultdict
 from set_config import log
-from geometry.pc_processing import get_neighbors_kdtree
-from viz.viz_utils import color_continuous_map, draw_view
-from viz.viz_utils import histogram
+from viz.viz_utils import color_continuous_map
 import tqdm
+import scipy.spatial as sps
 from scipy.stats import mode
 
 def get_smoothed_features(all_data, 
@@ -37,7 +36,11 @@ def get_smoothed_features(all_data,
             final_data = np.load(detail_data_file)['intensity']
 
         else:
-            dists, nbrs = get_neighbors_kdtree(pcd, detail_pcd, return_pcd=False)
+            src_pts = np.array(pcd.points)
+            query_pts = np.array(detail_pcd.points)
+            kd_tree = sps.KDTree(src_pts)
+            print('Finding neighbors in vicinity') 
+            dists,nbrs = kd_tree.query(query_pts, k=25, distance_upper_bound= 0.03) 
             num_pts = len(pcd.points)
             nbrs = [np.array([x for x in nbr_list  if x< num_pts]) for nbr_list in nbrs]
             nbrs = [nbr_list if len(nbr_list) > 0 else np.array([0]) for nbr_list in nbrs]
@@ -47,7 +50,7 @@ def get_smoothed_features(all_data,
             np.savez_compressed(detail_data_file, intensity = final_data)
 
         new_detail_pcd, _ = color_continuous_map(detail_pcd, final_data)
-        histogram(final_data, datum_name)
+        # histogram(final_data, datum_name)
         np.sort(final_data)
         
     except Exception as e:

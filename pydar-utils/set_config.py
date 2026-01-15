@@ -14,13 +14,13 @@ print(f"Current working directory: {cwd}")
 package_location = os.path.dirname(__file__)
 print(f"Package Location: {package_location}")
 
-config_file = os.environ.get("PDAR_CONFIG", f"{package_location}/pydar-utils_config.toml")
+config_file = os.environ.get("PDAR_CONFIG", f"{package_location}/package_config.toml")
 log_config_file = os.environ.get("PDAR_LOG_CONFIG", f"{package_location}/log.yml")
 
 log = logging.getLogger()
 
 def load_config(config_file: str) -> dict:
-    config = ''
+    config = dict()
     try:
         with open(config_file) as f:
             if 'toml' in config_file:
