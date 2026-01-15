@@ -13,7 +13,7 @@ from . import utils
 from . import viz
 
 # Import commonly used functions at package level for convenience
-from .geometry import center_and_rotate, zoom_pcd, clean_cloud, extract_skeleton
+from .geometry import zoom_pcd, clean_cloud
 from .math_utils import z_align_and_fit, get_center, rotation_matrix_from_arr
 from .utils import save, load, convert_las, to_o3d
 from .viz import draw, plot_3d, cluster_color
@@ -25,10 +25,8 @@ __all__ = [
     "utils",
     "viz",
     # Common functions
-    "center_and_rotate",
     "zoom_pcd",
     "clean_cloud",
-    "extract_skeleton",
     "z_align_and_fit",
     "get_center",
     "rotation_matrix_from_arr",
