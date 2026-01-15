@@ -81,7 +81,7 @@ include = ["pydar_utils*"]
 exclude = ["tests*", "scripts*", "docs*"]
 
 [tool.setuptools.package-data]
-pydar_utils = ["package_config.toml", "log.yml"]
+pydar_utils = ["*"]
 
 [tool.black]
 line-length = 88
