@@ -1,11 +1,8 @@
 import copy
 import numpy as np
 import open3d as o3d
-import scipy.cluster as spc
-from sklearn.metrics import silhouette_score
-from sklearn.cluster import DBSCAN, KMeans
+from sklearn.cluster import  KMeans
 import pyransac3d as pyrsc
-from matplotlib import pyplot as plt
 
 from set_config import config, log
 from .general import (get_radius, 

@@ -2,11 +2,6 @@
 import open3d as o3d
 import numpy as np
 from numpy import asarray as arr
-
-import matplotlib.pyplot as plt
-from open3d.io import read_point_cloud as read_pcd, write_point_cloud as write_pcd
-
-
 from set_config import  log
 from geometry.mesh_processing import check_properties, get_surface_clusters
 from viz.plotting import plot_dist_dist

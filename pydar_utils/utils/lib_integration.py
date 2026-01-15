@@ -3,11 +3,11 @@ import open3d as o3d
 import numpy as np
 from numpy import asarray as arr
 import scipy.spatial as sps
-from matplotlib import pyplot as plt, patches
+from matplotlib import pyplot as plt
 
 from set_config import config, log
 from math_utils.general import get_center, get_radius, get_percentile
-from viz.viz_utils import iter_draw, draw
+from viz.viz_utils import draw
 
 ## Numpy
 

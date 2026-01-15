@@ -32,7 +32,6 @@ from .point_cloud_filtering import (
     filter_pcd_list,
     bounding_box,
     filter_by_bb,
-    filter_by_norm,
 )
 from .reconstruction import (
     expand_features_to_orig,
@@ -79,7 +78,6 @@ __all__ = [
     "filter_pcd_list",
     "bounding_box",
     "filter_by_bb",
-    "filter_by_norm",
     # reconstruction
     "expand_features_to_orig",
     "overlap_voxel_grid",

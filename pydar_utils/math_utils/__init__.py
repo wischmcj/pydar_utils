@@ -19,6 +19,7 @@ from .general import (
     get_angles,
     get_center,
     get_radius,
+    filter_by_angle,
 )
 from .gradient import get_smoothed_features
 
@@ -39,6 +40,7 @@ __all__ = [
     "get_angles",
     "get_center",
     "get_radius",
+    "filter_by_angle",
     # gradient
     "get_smoothed_features",
 ]

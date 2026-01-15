@@ -3,13 +3,10 @@ import subprocess
 import open3d as o3d
 import numpy as np
 import os
-import scipy.spatial as sps
-from open3d.visualization import draw_geometries,draw_geometries_with_editing
+from open3d.visualization import draw_geometries
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 
-import os 
-import time
 from scipy.spatial.transform import Rotation as R
 import imageio
 from numpy import array as arr

@@ -3,8 +3,7 @@ from set_config import config
 import open3d as o3d
 import numpy as np
 import copy
-import matplotlib.pyplot as plt
-
+from matplotlib.pyplot import get_cmap
 from numpy import array as arr
 
 
@@ -212,7 +211,7 @@ def map_density(pcd,depth=10, outlier_quantile = .01, remove_outliers=False
         vertices_to_remove = densities < np.quantile(densities, outlier_quantile)
         mesh.remove_vertices_by_mask(vertices_to_remove)
         densities = densities[~vertices_to_remove]
-    density_colors = plt.get_cmap('plasma')((densities - densities.min()) / (densities.max() - densities.min()))
+    density_colors = get_cmap('plasma')((densities - densities.min()) / (densities.max() - densities.min()))
     density_colors = density_colors[:, :3]
     density_mesh = o3d.geometry.TriangleMesh()
     density_mesh.vertices = mesh.vertices

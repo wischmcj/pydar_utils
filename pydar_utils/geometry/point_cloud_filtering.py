@@ -4,10 +4,6 @@ import numpy as np
 import open3d as o3d
 from set_config import config, log
 
-from math_utils.general import (
-    get_angles,
-)
-
 def zoom_pcd(zoom_region,
             pcd, 
             reverse=False):
@@ -192,17 +188,3 @@ def filter_by_bb(pcd, exclude_boundaries, reverse_filter):
         new_chunk_data = np.vstack(filtered_chunk_data)
     
     return new_chunk_data
-
-
-
-def filter_by_norm(pcd, angle_thresh=10, rev = False):
-    norms = np.asarray(pcd.normals)
-    angles = np.apply_along_axis(get_angles, 1, norms)
-    angles = np.degrees(angles)
-    log.info(f"{angle_thresh=}")
-    if rev:
-        stem_idxs = np.where((angles < -angle_thresh) | (angles > angle_thresh))[0]
-    else:
-        stem_idxs = np.where((angles > -angle_thresh) & (angles < angle_thresh))[0]
-    stem_cloud = pcd.select_by_index(stem_idxs)
-    return stem_cloud

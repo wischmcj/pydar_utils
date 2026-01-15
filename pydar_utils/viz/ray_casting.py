@@ -1,9 +1,6 @@
 from copy import deepcopy
 import numpy as np
 from numpy import asarray as arr
-from glob import glob
-import re
-import random
 
 from open3d.t.geometry import RaycastingScene as rcs
 import open3d as o3d
