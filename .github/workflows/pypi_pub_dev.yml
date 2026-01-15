@@ -1,7 +1,11 @@
 name: Publish to PyPA Dev
 
 on:
-  pull_request
+  pull_request:
+    branches:
+      - 'main'
+    types:
+      - opened
 
 jobs:
   build:
