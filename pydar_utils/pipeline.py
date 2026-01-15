@@ -6,23 +6,14 @@ from set_config import log
 from collections import defaultdict
 from open3d.io import read_point_cloud as read_pcd
 from utils.io import convert_las, np_to_o3d, load
-# from canopy_metrics import get_downsample
 from utils.general import list_if
 from itertools import product
 from typing import Any
 
-def always_list(value):
-    if isinstance(value, list):
-        return value
-    elif isinstance(value, tuple):
-        return list(value)
-    else:
-        return [value]
 
 def get_files_by_seed(data_file_config, 
                         base_dir,
-                        # key_pattern = re.compile('.*seed([0-9]{1,3}).*')
-                        key_pattern = re.compile('.*(skio_[0-9]{1,3}_tl_[0-9]{1,3}).*')
+                        key_pattern= re.compile('.*_([0-9]{1,3}).*')
                         ):
     seed_to_files = defaultdict[Any, dict](dict)
     for file_type, file_info in data_file_config.items():
@@ -86,8 +77,8 @@ def get_data_from_config(seed_file_info, data_file_config):
         load_func = data_file_config[file_type]['load_func']
         load_kwargs = data_file_config[file_type].get('kwargs',{})
         load_value = load_func(file_path, **load_kwargs)
-        file_type = always_list(file_type)
-        load_value = always_list(load_value)
+        file_type = list_if(file_type)
+        load_value = list_if(load_value)
         if len(file_type) != len(load_value):
             raise ValueError(f'length of values returned by {load_func.__name__} ({len(load_value)}) is not equal to the length of the file_type {file_type}')
         for key, value in zip(file_type, load_value):
@@ -128,12 +119,10 @@ def loop_over_files(func,args = [], kwargs =[],
                     ):
     # reads in the files from the indicated directories
     files_by_seed = get_files_by_seed(data_file_config, base_dir, key_pattern=seed_pat)
-    print(f'files found in input directory {files_by_seed=}')
 
     files_by_seed = {seed:finfo for seed, finfo in files_by_seed.items() 
                             if ((requested_seeds==[] or seed in requested_seeds)
                               and seed not in skip_seeds)}
-    print(f'files after filtering {files_by_seed=}')
 
     if args ==[]: args = [None]*len(kwargs)
     inputs = [(arg,kwarg) for arg,kwarg in zip(list_if(args),list_if(kwargs))]
