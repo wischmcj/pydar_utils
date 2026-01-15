@@ -1,4 +1,4 @@
-name: Publish to PyPA Prod
+name: Publish to PyPA Dev
 
 on:
   pull_request
