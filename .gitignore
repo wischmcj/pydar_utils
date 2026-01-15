@@ -109,37 +109,6 @@ copy_of_fragment.pcd
 .envrc
 .git-old/*
 
-
-sho/*
-scripts/untracked/*
-scripts/to_share/*
-scripts/gui/*
-scripts/ml/*
-pydar_utils/tree.py
-ml/logs/*
-src/logs/*
-src/ml/*
-
-src/gui/*
-
-meshes/*
-/data/in_process/*
-*data/results/*
-data/bark_texture/*
-data/viz_configs/*
-
-
-new_lowc_refined_clusters.pkl
-other_clusters_w_order_in_process.pkl
-rf_seed_ext_root_ids.pkl
-seed135_two_voxpt05_uni3_step_shift.pkl
-seed151_post_voxpt05_uni3_shift.pkl
-skio_bounds.pkl
-data/results/protoQSM/high_contraction_iter1_top60_ids.py
-imgs/trunk_and_sphere.jpeg
-sho/skeletor_trunk_density_map.jpg
-sho/trunk_and_sphere.jpeg
-pydar_utils/utils/tiles.py
 git_filter_repo.md
 replace.txt
 
