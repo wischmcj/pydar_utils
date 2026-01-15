@@ -140,3 +140,10 @@ imgs/trunk_and_sphere.jpeg
 sho/skeletor_trunk_density_map.jpg
 sho/trunk_and_sphere.jpeg
 pydar_utils/utils/tiles.py
+git_filter_repo.md
+replace.txt
+
+testing_example/*
+examples/*
+package_config_local.toml
+log_config_local.yml

@@ -88,7 +88,7 @@ Key dependencies include:
 ### Configuration
 The library uses TOML configuration files for algorithm parameters:
 - `src/pydar_utils_config.toml` - Main configuration file
-- Environment variables: `PY_QSM_CONFIG`, `PY_QSM_LOG_CONFIG`
+- Environment variables: `PDAR_CONFIG`, `PDAR_LOG_CONFIG`
 
 ### Configuration
 
