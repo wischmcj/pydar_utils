@@ -3,7 +3,7 @@ name: Publish to PyPA Prod
 on:
   pull_request:
     branches:
-      - 'releases/*'
+      - 'release/*'
     types:
       - closed
 
@@ -41,7 +41,7 @@ jobs:
     - build
     runs-on: ubuntu-latest
     environment:
-      name: Production
+      name: prod
       url: https://pypi.org/p/pydar_utils/
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
