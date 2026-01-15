@@ -67,13 +67,13 @@ all = [
 [project.urls]
 Homepage = "https://github.com/wischmcj/pydar-utils"
 Documentation = "https://pydar-utils.readthedocs.io/"
-Repository = "https://github.com/your-username/pydar-utils.git"
-Issues = "https://github.com/your-username/pydar-utils/issues"
+Repository = "https://github.com/wischmcj/pydar-utils.git"
+Issues = "https://github.com/wischmcj/pydar-utils/issues"
 
-[project.scripts]
-pydar-utils-tree-isolation = "pydar-utils.tree_isolation:main"
-pydar-utils-qsm-generation = "pydar-utils.qsm_generation:main"
-pydar-utils-canopy-metrics = "pydar-utils.canopy_metrics:main"
+# [project.scripts]
+# pydar-utils-tree-isolation = "pydar-utils.tree_isolation:main"
+# pydar-utils-qsm-generation = "pydar-utils.qsm_generation:main"
+# pydar-utils-canopy-metrics = "pydar-utils.canopy_metrics:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -81,7 +81,7 @@ include = ["pydar-utils*"]
 exclude = ["tests*", "scripts*", "docs*"]
 
 [tool.setuptools.package-data]
-pydar-utils = ["pydar-utils_config.toml"]
+pydar-utils = ["package_config.toml", "log.yml"]
 
 [tool.black]
 line-length = 88
@@ -126,45 +126,45 @@ module = [
 ]
 ignore_missing_imports = true
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    "--cov=pydar-utils",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
-]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-]
+# [tool.pytest.ini_options]
+# testpaths = ["tests"]
+# python_files = ["test_*.py", "*_test.py"]
+# python_classes = ["Test*"]
+# python_functions = ["test_*"]
+# addopts = [
+#     "--strict-markers",
+#     "--strict-config",
+#     "--cov=pydar-utils",
+#     "--cov-report=term-missing",
+#     "--cov-report=html",
+#     "--cov-report=xml",
+# ]
+# markers = [
+#     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+#     "integration: marks tests as integration tests",
+#     "unit: marks tests as unit tests",
+# ]
 
-[tool.coverage.run]
-source = ["pydar-utils"]
-omit = [
-    "*/tests/*",
-    "*/test_*",
-    "*/__pycache__/*",
-    "*/venv/*",
-    "*/newvenv/*",
-]
+# [tool.coverage.run]
+# source = ["pydar-utils"]
+# omit = [
+#     "*/tests/*",
+#     "*/test_*",
+#     "*/__pycache__/*",
+#     "*/venv/*",
+#     "*/newvenv/*",
+# ]
 
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-]
+# [tool.coverage.report]
+# exclude_lines = [
+#     "pragma: no cover",
+#     "def __repr__",
+#     "if self.debug:",
+#     "if settings.DEBUG",
+#     "raise AssertionError",
+#     "raise NotImplementedError",
+#     "if 0:",
+#     "if __name__ == .__main__.:",
+#     "class .*\\bProtocol\\):",
+#     "@(abc\\.)?abstractmethod",
+# ]
