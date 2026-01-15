@@ -7,7 +7,7 @@ import numpy as np
 from numpy import asarray as arr
 import itertools
 import tqdm
-from utils.io import read_pcd
+from open3d.io import read_point_cloud as read_pcd
 
 
 

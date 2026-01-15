@@ -92,7 +92,7 @@ def project_pcd(point_cloud = None,
     if plot:
         log.info(f'Plotting...')
         import os
-        base_dir = f'/media/penguaman/backupSpace/lidar_sync/pydar-utils/skio/cluster_joining/projected_areas_clusters/{seed}/{name}'
+        base_dir = f'/media/penguaman/tosh2b2/lidar_sync/pyqsm/skio/cluster_joining/projected_areas_clusters/{seed}/{name}'
         os.makedirs(base_dir, exist_ok=True)
         try:
             for pos in screen_shots:
