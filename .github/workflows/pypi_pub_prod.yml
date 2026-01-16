@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: prod
-      url: https://pypi.org/p/pydar-utils/
+      url: https://pypi.org/p/pydar_utils/
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 

@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: dev
-      url: https://test.pypi.org/pydar-utils/
+      url: https://test.pypi.org/pydar_utils/
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
