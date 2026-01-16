@@ -4,7 +4,7 @@ A comprehensive toolkit for processing, analyzing, and visualizing terrestrial l
 data of trees, including point cloud processing, mesh reconstruction, skeletonization, and QSM generation.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.0.2"
 import os 
 from .set_config import load_config
 # Load unconfigured logger 
