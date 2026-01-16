@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-import logging.config
 import os
 
 import toml

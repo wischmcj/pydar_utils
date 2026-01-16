@@ -2,6 +2,7 @@ from collections import defaultdict
 from copy import deepcopy
 from glob import glob
 import re
+import logging
 import open3d as o3d
 import numpy as np
 from numpy import asarray as arr
@@ -13,23 +14,24 @@ from tqdm import tqdm
 from glob import glob
 import os
 
-from set_config import log
-from geometry.reconstruction import get_neighbors_kdtree
-from geometry.point_cloud_processing import (
+from pydar_utils.geometry.reconstruction import get_neighbors_kdtree
+from pydar_utils.geometry.point_cloud_processing import (
     join_pcd_files
 )
-from viz.ray_casting import project_pcd
-from viz.viz_utils import color_continuous_map, draw, draw_view
-from viz.color import (
+from pydar_utils.viz.ray_casting import project_pcd
+from pydar_utils.viz.viz_utils import color_continuous_map, draw, draw_view
+from pydar_utils.viz.color import (
     get_green_surfaces,
     split_on_percentile,
 )
 from sklearn.cluster import KMeans
 
-from utils.io import load
-from viz.plotting import  histogram
-from utils.io import np_to_o3d
-from pipeline import loop_over_files, read_and_downsample
+from pydar_utils.utils.io import load
+from pydar_utils.viz.plotting import  histogram
+from pydar_utils.utils.io import np_to_o3d
+from pydar_utils.pipeline import loop_over_files, read_and_downsample
+
+log = logging.getLogger(__name__)
 
 color_conds = {        'white' : lambda tup: tup[0]>.5 and tup[0]<5/6 and tup[2]>.5 ,
                'pink' : lambda tup:  tup[0]>=.7 and tup[2]>.3 ,

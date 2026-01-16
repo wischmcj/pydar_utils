@@ -1,12 +1,17 @@
 import numpy as np
+import os 
 from logging import getLogger
 
 from math_utils import get_percentile
-from set_config import config, log
+
+log = getLogger(__name__)
+
+TRUNK_PCTILE_START = os.environ.get("TRUNK_PCTILE_START", 3)
+TRUNK_PCTILE_END = os.environ.get("TRUNK_PCTILE_END", 10)
 
 def crop_by_percentile(pcd, 
-                  start = config['trunk']['lower_pctile'],
-                  end = config['trunk']['upper_pctile'],
+                  start = TRUNK_PCTILE_START,
+                  end = TRUNK_PCTILE_END,
                   axis = 2,
                   invert = False):
     algo_source_pcd = pcd  

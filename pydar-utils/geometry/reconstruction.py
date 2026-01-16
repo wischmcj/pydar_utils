@@ -7,6 +7,7 @@ import numpy as np
 from numpy import asarray as arr
 import itertools
 import tqdm
+from logging import getLogger
 from open3d.io import read_point_cloud as read_pcd
 
 
@@ -18,7 +19,7 @@ import open3d as o3d
 import numpy as np
 from numpy import asarray as arr
 
-from set_config import log
+log = getLogger(__name__)
 
 def expand_features_to_orig(nbr_pcd, orig_pcd, nbr_data):
     # # get neighbors of comp_pcd in the extracted feat pcd
