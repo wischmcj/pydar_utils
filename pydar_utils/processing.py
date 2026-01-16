@@ -10,12 +10,16 @@ import matplotlib.pyplot as plt
 
 log = getLogger(__name__)
 
-TRUNK_PCTILE_START = os.environ.get("TRUNK_PCTILE_START", 3)
-TRUNK_PCTILE_END = os.environ.get("TRUNK_PCTILE_END", 10)
+PDAR_TRUNK_LOWER_PCTILE = float(os.environ.get("PDAR_TRUNK_LOWER_PCTILE", 3))
+PDAR_TRUNK_UPPER_PCTILE = float(os.environ.get("PDAR_TRUNK_UPPER_PCTILE", 10))
+PDAR_INITIAL_CLEAN_VOXEL_SIZE = float(os.environ.get("PDAR_INITIAL_CLEAN_VOXEL_SIZE", 0.04))
+PDAR_INITIAL_CLEAN_NEIGHBORS = int(os.environ.get("PDAR_INITIAL_CLEAN_NEIGHBORS", 2))
+PDAR_INITIAL_CLEAN_RATIO = float(os.environ.get("PDAR_INITIAL_CLEAN_RATIO", 4))
+PDAR_INITIAL_CLEAN_ITERS = int(os.environ.get("PDAR_INITIAL_CLEAN_ITERS", 3))
 
 def crop_by_percentile(pcd, 
-                  start = TRUNK_PCTILE_START,
-                  end = TRUNK_PCTILE_END,
+                  start = PDAR_TRUNK_LOWER_PCTILE,
+                  end = PDAR_TRUNK_UPPER_PCTILE,
                   axis = 2,
                   invert = False):
     algo_source_pcd = pcd  
@@ -36,10 +40,10 @@ def crop_and_highlight(pcd,lower,upper,axis):
 
 
 def clean_cloud(pcd,
-                voxels=config['initial_clean']['voxel_size'],
-                neighbors=config['initial_clean']['neighbors'],
-                ratio=config['initial_clean']['ratio'],
-                iters = config['initial_clean']['iters']
+                voxels=PDAR_INITIAL_CLEAN_VOXEL_SIZE,
+                neighbors=PDAR_INITIAL_CLEAN_NEIGHBORS,
+                ratio=PDAR_INITIAL_CLEAN_RATIO,
+                iters = PDAR_INITIAL_CLEAN_ITERS
                 ):
     """Reduces the number of points in the point cloud via
     voxel downsampling. Reducing noise via statistical outlier removal.
