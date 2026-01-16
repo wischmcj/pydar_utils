@@ -2,7 +2,11 @@ import numpy as np
 import os 
 from logging import getLogger
 
-from math_utils import get_percentile
+from math_utils import get_percentile, get_center, get_radius
+from scipy.spatial import KDTree
+import open3d as o3d
+from viz import draw
+import matplotlib.pyplot as plt
 
 log = getLogger(__name__)
 
@@ -62,3 +66,60 @@ def clean_cloud(pcd,
     if not run_voxels and not run_stat:
         log.warning("No cleaning steps were run")        
     return final
+
+
+def find_neighbors_in_ball(
+    base_pts, points_to_search, 
+    points_idxs, radius=None, center=None,
+    use_top = None, #(85,100)
+    draw_results = False,
+    radius_multiplier = 1,
+    min_radius = 0.01,
+    max_radius = 1.5,
+):
+    """
+        Essentially a KNN radius search but with one sphere 
+            used rather than one for each pt
+       Defines a centroid for a set of base points,
+        finds all points within the search set falling
+         within a sphere of a given radius centered on the centroid
+    """
+    if use_top:
+        top_pt_idxs,_ = get_percentile(base_pts,use_top[0],use_top[1])
+        top_pts = base_pts[top_pt_idxs]
+        if not center:
+            center = get_center(top_pts)
+            center = [center[0], center[1], max(base_pts[:, 2])] 
+        if not radius:
+            radius = get_radius(top_pts) * radius_multiplier
+    else:
+        if not center:
+            center = get_center(base_pts)
+        if not radius:
+            radius = get_radius(base_pts) * radius_multiplier
+
+    if radius < min_radius:
+        radius = min_radius
+    if radius > max_radius:
+        radius = max_radius
+    log.info(f" Finding nbrs in ball w/ {radius=}, {center=}")
+
+    full_tree = sps.KDTree(points_to_search)
+    neighbors = full_tree.query_ball_point(center, r=radius)
+    res = []
+    if draw_results:
+        ax = plt.figure().add_subplot(projection='3d')
+        ax.scatter(base_pts[:,0], base_pts[:,1], base_pts[:,2], 'r')
+    for results in neighbors:
+        new_points = np.setdiff1d(results, points_idxs)
+        res.extend(new_points)
+        if draw_results:
+            nearby_points = points_to_search[new_points]
+            ax.plot(nearby_points[:,0], nearby_points[:,1], nearby_points[:,2], 'o')
+    sphere =  o3d.geometry.TriangleMesh.create_sphere(radius=radius)
+    sphere.translate(center)
+    if draw_results:
+        test = o3d.geometry.PointCloud()
+        test.points = o3d.utility.Vector3dVector(base_pts)
+        draw([sphere, test])
+    return sphere, neighbors, center, radius
