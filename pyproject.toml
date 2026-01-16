@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pydar_utils"
-version = "0.1.0"
+version = "0.0.1"
 description = "Python Utilities for TLS LiDAR Scans of Trees"
 readme = "README.md"
 license = {text = "Mozilla Public License Version 2.0"}
 authors = [
-    {name = "pydar_utils Contributors"}
+    {name = "Collin Wischmeyer"}
 ]
 maintainers = [
-    {name = "pydar_utils Contributors"}
+    {name = "Collin Wischmeyer"}
 ]
 keywords = [
     "lidar", "point-cloud", "tree-analysis", "forestry", "3d-processing",
@@ -79,9 +79,6 @@ Issues = "https://github.com/wischmcj/pydar_utils/issues"
 where = ["."]
 include = ["pydar_utils*"]
 exclude = ["tests*", "scripts*", "docs*"]
-
-[tool.setuptools.package-data]
-pydar_utils = ["*"]
 
 [tool.black]
 line-length = 88
