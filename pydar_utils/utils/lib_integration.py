@@ -3,12 +3,9 @@ import open3d as o3d
 import numpy as np
 from numpy import asarray as arr
 import scipy.spatial as sps
-from matplotlib import pyplot as plt
 
 import logging
 log = logging.getLogger()
-from math_utils.general import get_center, get_radius, get_percentile
-from viz.viz_utils import draw
 
 ## Numpy
 

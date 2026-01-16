@@ -3,7 +3,7 @@ import open3d as o3d
 import numpy as np
 from numpy import asarray as arr
 from logging import getLogger
-from geometry.mesh_processing import check_properties, get_surface_clusters
+from .mesh_processing import check_properties, get_surface_clusters
 
 from open3d.visualization import draw_geometries
 

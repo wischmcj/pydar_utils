@@ -11,8 +11,7 @@ from numpy import asarray as arr
 
 import matplotlib.pyplot as plt
 
-from viz.viz_utils import color_continuous_map, draw
-from viz.viz_utils import color_continuous_map
+from .viz_utils import color_continuous_map, draw
 
 import pyvista as pv
 
