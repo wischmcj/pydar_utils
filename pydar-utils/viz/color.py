@@ -4,7 +4,7 @@ import numpy as np
 from numpy import array as arr, mean
 import scipy.spatial as sps
 import  open3d as o3d
-from viz.viz_utils import color_continuous_map, draw
+from .viz_utils import color_continuous_map, draw
 from logging import getLogger
 log = getLogger()
 

@@ -12,7 +12,6 @@ from open3d.io import read_point_cloud as read_pcd
 
 
 
-
 from collections import defaultdict
 
 import open3d as o3d
