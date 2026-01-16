@@ -3,7 +3,7 @@
 __version__ = "0.1.0"
 
 from .algo import smooth_feature
-from .general import list_if
+from .general import list_if, poprow
 from .io import (
     save_line_set,
     load_line_set,
@@ -29,6 +29,7 @@ __all__ = [
     "smooth_feature",
     # general
     "list_if",
+    "poprow",
     # io
     "save_line_set",
     "load_line_set",

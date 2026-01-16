@@ -4,9 +4,17 @@ import numpy as np
 from numpy import asarray as arr
 from set_config import  log
 from geometry.mesh_processing import check_properties, get_surface_clusters
-from viz.plotting import plot_dist_dist
-from viz.viz_utils import draw
 
+from open3d.visualization import draw_geometries
+
+from logging import getLogger
+log = getLogger(__name__)
+
+def draw(pcds, **kwargs):
+    if isinstance(pcds, list):
+        draw_geometries(pcds, **kwargs)
+    else:
+        draw_geometries([pcds], **kwargs)
 
 def deform_mesh(mesh):
     vertices = np.asarray(mesh.vertices)
@@ -80,14 +88,12 @@ def meshfix(mesh, algo = 'pyt'):
     return tmesh
 
 def pivot_ball_mesh(pcd, 
-                    radii_factors = [0.1,0.2,0.3,0.4,0.5,0.7,1,1.2,1.5,1.7,2],
-                    plot_distribution=False):
+                    radii_factors = [0.1,0.2,0.3,0.4,0.5,0.7,1,1.2,1.5,1.7,2]
+                    ):
     log.info(f'Computing KNN distance')
     distances = pcd.compute_nearest_neighbor_distance()
     avg_dist = np.mean(distances)
     print(f'{avg_dist=}')
-    if plot_distribution:
-        plot_dist_dist(pcd,distances)
     dist_radii = [f*avg_dist for f in radii_factors]
     # radii = [avg_dist*(i/10) for i in range(1,20)]
     # radii = [0.2*avg_dist,0.3*avg_dist,0.5*avg_dist,0.7*avg_dist,0.9*avg_dist,avg_dist, 1.2*avg_dist,1.5*avg_dist,1.7*avg_dist, 2*avg_dist,2.5*avg_dist,3*avg_dist] 

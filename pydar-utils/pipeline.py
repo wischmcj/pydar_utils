@@ -1,8 +1,8 @@
 import numpy as np
 import re
+import logging
 from glob import glob
 from joblib import Parallel, delayed
-from set_config import log
 from collections import defaultdict
 from open3d.io import read_point_cloud as read_pcd
 from utils.io import convert_las, np_to_o3d, load
@@ -10,6 +10,7 @@ from utils.general import list_if
 from itertools import product
 from typing import Any
 
+log = logging.getLogger()
 
 def get_files_by_seed(data_file_config, 
                         base_dir,

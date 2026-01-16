@@ -2,10 +2,10 @@ import open3d as o3d
 import numpy as np
 import os
 from collections import defaultdict
-from set_config import log
-from viz.viz_utils import color_continuous_map
 import tqdm
 import scipy.spatial as sps
+from logging import getLogger
+log = getLogger(__name__)
 
 def get_smoothed_features(all_data, 
                 save_file=None,
@@ -47,10 +47,8 @@ def get_smoothed_features(all_data,
             for nbr_list in tqdm(nbrs): final_data.append(np.array(np.mean(datum[nbr_list])))
             final_data = np.array(final_data)
             np.savez_compressed(detail_data_file, intensity = final_data)
-
-        new_detail_pcd, _ = color_continuous_map(detail_pcd, final_data)
-        # histogram(final_data, datum_name)
         np.sort(final_data)
+        return final_data, detail_pcd
         
     except Exception as e:
         log.info(f'error {e} when getting detail features')

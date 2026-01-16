@@ -4,19 +4,20 @@ from numpy import asarray as arr
 
 from open3d.t.geometry import RaycastingScene as rcs
 import open3d as o3d
+import open3d.core as o3c
 
 import numpy as np
 from numpy import asarray as arr
 
 import matplotlib.pyplot as plt
 
-from set_config import log
 from viz.viz_utils import color_continuous_map, draw
 from viz.viz_utils import color_continuous_map
 
 import pyvista as pv
 
-import open3d.core as o3c
+from logging import getLogger
+log = getLogger()
 
 pinhole_config = { 'fov_deg':60,'center':[-3,-.25,-3],
                     'eye':[10, 10, 20],'up':[0, 0, 1],

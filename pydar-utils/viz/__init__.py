@@ -16,7 +16,7 @@ from .color import (
     color_distribution,
     split_on_percentile,
 )
-from .plotting import plot_dist_dist, plot_3d, histogram
+from .plotting import plot_dist_dist, plot_3d, histogram, plot_neighbor_distribution
 from .ray_casting import (
     get_points_inside_mesh,
     project_pcd,
@@ -54,6 +54,7 @@ __all__ = [
     "plot_dist_dist",
     "plot_3d",
     "histogram",
+    "plot_neighbor_distribution",
     # ray_casting
     "get_points_inside_mesh",
     "project_pcd",
