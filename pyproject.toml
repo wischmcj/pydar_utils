@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pydar_utils"
-version = "0.0.1"
+version = "0.0.2"
 description = "Python Utilities for TLS LiDAR Scans of Trees"
 readme = "README.md"
-license = {text = "Mozilla Public License Version 2.0"}
+license-files = ["LICENSE.txt"]
 authors = [
     {name = "Collin Wischmeyer"}
 ]
@@ -21,7 +21,6 @@ keywords = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",

@@ -1,6 +1,6 @@
 """Mathematical utilities for fitting, interpolation, and general math operations."""
 
-__version__ = "0.1.0"
+__version__ = "0.0.2"
 
 from .fit import (
     z_align_and_fit,

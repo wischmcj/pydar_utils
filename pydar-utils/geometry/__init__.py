@@ -1,6 +1,6 @@
 """Geometry utilities for point cloud and mesh processing."""
 
-__version__ = "0.1.0"
+__version__ = "0.0.2"
 
 from .mesh_processing import (
     get_ball_mesh,
