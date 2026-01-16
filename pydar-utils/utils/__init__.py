@@ -20,7 +20,6 @@ from .lib_integration import (
     pts_to_cloud,
     get_pairs,
     get_neighbors_in_tree,
-    find_neighbors_in_ball,
 )
 from .log_utils import ConsoleHandler
 
@@ -45,7 +44,6 @@ __all__ = [
     "pts_to_cloud",
     "get_pairs",
     "get_neighbors_in_tree",
-    "find_neighbors_in_ball",
     # log_utils
     "ConsoleHandler",
 ]

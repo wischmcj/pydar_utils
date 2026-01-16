@@ -56,6 +56,7 @@ def orientation_from_norms(norms, samples=10, max_iter=100):
         iter_num += 1
         rand_id = np.random.randint(len(norms) - 1)
         # pop random row from norms
+        vect = norms[rand_id]
         norms = np.vstack((norms[:rand_id], norms[rand_id + 1 :]))
         dot_products = abs(np.dot(norms, vect))
         most_normal_val = min(dot_products)

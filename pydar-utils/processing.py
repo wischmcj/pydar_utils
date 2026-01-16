@@ -3,7 +3,6 @@ import os
 from logging import getLogger
 
 from math_utils import get_percentile, get_center, get_radius
-from scipy.spatial import KDTree
 import open3d as o3d
 from viz import draw
 import matplotlib.pyplot as plt

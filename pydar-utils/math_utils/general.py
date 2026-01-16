@@ -40,7 +40,7 @@ def rotation_matrix_from_arr(a, b: np.array):
     """
     Returns matrix R such that a*R = b.
     """
-    if np.linalg.norm(b) == 0:
+    if np.linalg.norm(b) == 0 or np.allclose(a, b):
         return np.eye(3)
     if np.linalg.norm(b) < 0.99 or np.linalg.norm(b) > 1.01:
         raise ValueError("b must be a unit vector")
