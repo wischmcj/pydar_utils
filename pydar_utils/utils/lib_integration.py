@@ -5,7 +5,8 @@ from numpy import asarray as arr
 import scipy.spatial as sps
 from matplotlib import pyplot as plt
 
-from set_config import config, log
+import logging
+log = logging.getLogger()
 from math_utils.general import get_center, get_radius, get_percentile
 from viz.viz_utils import draw
 
@@ -64,7 +65,10 @@ def find_neighbors_in_ball(
     base_pts, points_to_search, 
     points_idxs, radius=None, center=None,
     use_top = None, #(85,100)
-    draw_results = False
+    draw_results = False,
+    radius_multiplier = 1,
+    min_radius = 0.01,
+    max_radius = 1.5,
 ):
     """
         Essentially a KNN radius search but with one sphere 
@@ -80,17 +84,17 @@ def find_neighbors_in_ball(
             center = get_center(top_pts)
             center = [center[0], center[1], max(base_pts[:, 2])] 
         if not radius:
-            radius = get_radius(top_pts) * config['sphere']["radius_multiplier"]
+            radius = get_radius(top_pts) * radius_multiplier
     else:
         if not center:
             center = get_center(base_pts)
         if not radius:
-            radius = get_radius(base_pts) * config['sphere']["radius_multiplier"]
+            radius = get_radius(base_pts) * radius_multiplier
 
-    if radius < config['sphere']["min_radius"]:
-        radius = config['sphere']["min_radius"]
-    if radius > config['sphere']["max_radius"]:
-        radius = config['sphere']["max_radius"]
+    if radius < min_radius:
+        radius = min_radius
+    if radius > max_radius:
+        radius = max_radius
     log.info(f" Finding nbrs in ball w/ {radius=}, {center=}")
 
     full_tree = sps.KDTree(points_to_search)

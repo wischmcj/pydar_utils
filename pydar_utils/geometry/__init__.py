@@ -17,10 +17,7 @@ from .point_cloud_processing import (
     join_pcd_files,
     create_one_or_many_pcds,
     normalize_to_origin,
-    clean_cloud,
     crop,
-    crop_by_percentile,
-    crop_and_highlight,
     cluster_plus,
     cluster_and_get_largest,
 )
@@ -64,10 +61,7 @@ __all__ = [
     "join_pcd_files",
     "create_one_or_many_pcds",
     "normalize_to_origin",
-    "clean_cloud",
     "crop",
-    "crop_by_percentile",
-    "crop_and_highlight",
     "cluster_plus",
     "cluster_and_get_largest",
     # point_cloud_filtering

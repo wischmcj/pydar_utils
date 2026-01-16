@@ -8,18 +8,17 @@ import os
 import toml
 import yaml
 
-cwd = os.getcwd()
-print(f"Current working directory: {cwd}")
-# Read in environment variables, set defaults if not present
-package_location = os.path.dirname(__file__)
-print(f"Package Location: {package_location}")
-
-config_file = os.environ.get("PDAR_CONFIG", f"{package_location}/package_config.toml")
-log_config_file = os.environ.get("PDAR_LOG_CONFIG", f"{package_location}/log.yml")
-
 log = logging.getLogger()
 
-def load_config(config_file: str) -> dict:
+def config_to_env(config: dict):
+    for key, value in config.items():
+        key = f"PDAR_{key.upper()}"
+        coalalesced_val = os.environ.get(key, value)
+        if value != coalalesced_val:
+            log.info(f"Existing value for {key} found: {coalalesced_val}")
+        os.environ[key] = coalalesced_val
+
+def load_config(config_file: str, load_to_env: bool = True) -> dict:
     config = dict()
     try:
         with open(config_file) as f:
@@ -31,15 +30,6 @@ def load_config(config_file: str) -> dict:
     except Exception as error:
         log.error(f"Error loading config {config_file}: {error}")
         log.error(f"Default values will be used")
+    if load_to_env:
+        config_to_env(config)
     return config
-
-
-log_config = load_config(log_config_file)
-try:
-    logging.config.dictConfig(log_config)
-except Exception as e:
-    log.error(f"Error loading log config {log_config_file}: {e}")
-    log.error(f"Default values will be used")
-log = logging.getLogger('calc')
-
-config = load_config(config_file)

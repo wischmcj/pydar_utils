@@ -1,16 +1,16 @@
+import os 
 import pickle 
 import open3d as o3d
 import numpy as np
-from set_config import log, config
 from numpy import array as arr
 from itertools import product
 from prettytable import PrettyTable
 import laspy
+import logging
+log = logging.getLogger()
 
 # from open3d.io import read_point_cloud
-
-use_super_user = config['io']['super_user']
-data_root = config['io']['data_root']
+data_root = os.environ.get('PDAR_DATA_ROOT', '/data/')
 
 # def read_pcd(file, root_dir = data_root):
 #     pcd = read_point_cloud

@@ -12,7 +12,6 @@ from .fit import (
 )
 from .general import (
     get_percentile,
-    poprow,
     rotation_matrix_from_arr,
     unit_vector,
     angle_from_xy,

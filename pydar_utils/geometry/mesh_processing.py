@@ -1,5 +1,3 @@
-
-from set_config import config
 import open3d as o3d
 import numpy as np
 import copy
@@ -198,10 +196,11 @@ def get_surface_clusters(mesh,
         out_mesh.remove_triangles_by_mask(~triangles_to_remove)
     return mesh_0,out_mesh, triangle_clusters
 
-def map_density(pcd,depth=10, outlier_quantile = .01, remove_outliers=False
-                 ,normals_radius   = config['stem']["normals_radius"]
-                ,normals_nn       = config['stem']["normals_nn"]  
-                ,normals_smoothing_nn       = config['stem']["normals_smoothing_nn"]     ):
+def map_density(pcd
+                 ,normals_radius = 0.1 
+                ,normals_nn = 30
+                ,normals_smoothing_nn = 50      
+                ,depth=10, outlier_quantile = .01, remove_outliers=False    ):
     print('creating mesh from pcd')
     pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=normals_radius, max_nn=normals_nn))
     pcd.orient_normals_consistent_tangent_plane(normals_smoothing_nn)
