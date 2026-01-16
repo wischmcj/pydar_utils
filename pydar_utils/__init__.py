@@ -6,9 +6,10 @@ data of trees, including point cloud processing, mesh reconstruction, skeletoniz
 
 __version__ = "0.0.2"
 import os 
-from .set_config import load_config
+from set_config import load_config
 # Load unconfigured logger 
 import logging
+import logging.config as logging_config
 log = logging.getLogger('initialize')
 
 # Get dir name for troubleshooting
@@ -18,25 +19,21 @@ print(f"Current working directory: {cwd}")
 package_location = os.path.dirname(__file__)
 print(f"Package Location: {package_location}")
 
-# get config file locations
-config_file = os.environ.get("PDAR_CONFIG", f"{package_location}/package_config.toml")
-log_config_file = os.environ.get("PDAR_LOG_CONFIG", f"{package_location}/log.yml")
-
-package_location = os.path.dirname(__file__)
-log_config_file = os.environ.get("PDAR_LOG_CONFIG", f"{package_location}/log.yml")
 
 # load log config
+log_config_file = os.environ.get("PDAR_LOG_CONFIG", f"{package_location}/log.yml")
 log_config = load_config(log_config_file, load_to_env=False)
-
+print(f"Log config: {log_config}")
 try:
-    logging.config.dictConfig(log_config)
+    logging_config.dictConfig(log_config)
 except Exception as e:
     log.error(f"Error loading log config {log_config_file}: {e}")
     log.error(f"Default values will be used")
 
 # load package config
-load_config(log_config_file, load_to_env=False)
-
+config_file = os.environ.get("PDAR_CONFIG", f"{package_location}/package_config.toml")
+env_config = load_config(config_file, load_to_env=True)
+log.info(f"Environment config: {env_config}")
 
 # Import submodules to make them available as pydar_utils.geometry, etc.
 from . import geometry
