@@ -46,7 +46,6 @@ from .geometry import zoom_pcd
 from .math_utils import z_align_and_fit, get_center, rotation_matrix_from_arr
 from .utils import save, load, convert_las, to_o3d
 from .viz import draw, plot_3d
-from processing import clean_cloud, crop_and_highlight
 
 __all__ = [
     # Submodules

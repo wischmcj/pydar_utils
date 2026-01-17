@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pydar_utils"
-version = "0.0.2"
+version = "0.0.3"
 description = "Python Utilities for TLS LiDAR Scans of Trees"
 readme = "README.md"
 license-files = ["LICENSE.txt"]

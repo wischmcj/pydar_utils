@@ -57,40 +57,45 @@ def rotation_matrix_from_arr(a, b: np.array):
 
 def unit_vector(vector):
     """Returns the unit vector of the vector."""
-    return vector / np.linalg.norm(vector)
+    norm = np.linalg.norm(vector)
+    if norm>0:
+        return vector/norm
+    return np.zeros_like(vector)
 
 
-def angle_from_xy(v1):
+def angle_from_xy_plane(v1):
+    """
+        angle w/ xy plane = angle with projection on xy plane 
+        projection of [u,v,w] on xy plane is [u,v,0]
+        unit vectors have same angle as source vectors
+
+        angle = arccos(dot product/(norm1*norm2))
+        norm1=norm2=1 (as weve reduced to unit vectors)p
+        angle = arccos(dot product)
+        
+    """
+    # get projection on xy plane 
     v2 = [v1[0], v1[1], 0]
     v1_u = unit_vector(v1)
     v2_u = unit_vector(v2)
-    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+    return np.arccos(np.clip(np.dot(v1_u, v2_u),-1.0,1.0))
 
 
-def get_angles(tup, radians=False, reference = 'XY'):
-    """Gets the angle of a vector with the XY axis"""
+def get_angles(v1, radians=False, reference = 'XY'):
+    """Gets the angle of a vector with the specified axis"""
     if reference == 'XY':
-        a = tup[0]
-        b = tup[1]
-        c = tup[2]
+        v2 = [v1[0], v1[1], 0]
     if reference == 'XZ':
-        a = tup[0]
-        b = tup[2]
-        c = tup[1]
-    if reference == 'ZY':
-        a = tup[1]
-        b = tup[0]
-        c = tup[2]
-    denom = np.sqrt(a**2 + b**2)
-    if denom != 0:
-        radians = np.arctan(c / np.sqrt(a**2 + b**2))
-        if radians:
-            return radians
-        else:
-            return np.degrees(radians)
+        v2 = [v1[0], 0, v1[2]]
+    if reference == 'YZ':
+        v2 = [0, v1[1], v1[2]]
+    v1_u = unit_vector(v1)
+    v2_u = unit_vector(v2)
+    angle_radians = np.arccos(np.clip(np.dot(v1_u, v2_u),-1.0,1.0))
+    if radians:
+        return angle_radians
     else:
-        return 0
-
+        return np.degrees(angle_radians)
 
 def get_center(points, center_type="centroid"):
     """Attempts to find a representitiver 'center' given a
