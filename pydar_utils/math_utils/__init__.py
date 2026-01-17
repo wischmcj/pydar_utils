@@ -1,6 +1,6 @@
 """Mathematical utilities for fitting, interpolation, and general math operations."""
 
-__version__ = "0.1.0"
+__version__ = "0.0.2"
 
 from .fit import (
     z_align_and_fit,
@@ -12,7 +12,6 @@ from .fit import (
 )
 from .general import (
     get_percentile,
-    poprow,
     rotation_matrix_from_arr,
     unit_vector,
     angle_from_xy,

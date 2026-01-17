@@ -11,9 +11,8 @@ from scipy.spatial.transform import Rotation as R
 import imageio
 from numpy import array as arr
 from time import sleep
-from scipy.spatial.transform import Rotation as R
-
-from set_config import log
+from logging import getLogger
+log = getLogger()
 
 
 s27d = "s32_downsample_0.04.pcd"

@@ -3,7 +3,8 @@
 from joblib import Parallel, delayed
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
-from set_config import log
+from logging import getLogger
+log = getLogger(__name__)
 
 def smooth_feature( points, values, query_pts=None,
                     n_nbrs = 25,

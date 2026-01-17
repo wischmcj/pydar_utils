@@ -1,5 +1,7 @@
 import numpy as np
-from set_config import log
+
+from logging import getLogger
+log = getLogger(__name__)
 
 rot_90_y = np.array([[0,1,0],[1,0,0],[0,0,-1]]) # rotates dead on
 rot_90_z = np.array([[0,-1,0],[1,0,0],[0,0,1]]) 
@@ -34,21 +36,11 @@ def get_percentile(pts, low, high, axis=2, invert = False):
     # pcd_minus_ground = pcd.select_by_index(min_mask, invert=True)
     return select_idxs, vals
 
-
-def poprow(my_array, pr):
-    """Row popping in numpy arrays
-    Input: my_array - NumPy array, pr: row index to pop out
-    Output: [new_array,popped_row]"""
-    i = pr
-    pop = my_array[i]
-    new_array = np.vstack((my_array[:i], my_array[i + 1 :]))
-    return new_array, pop
-
 def rotation_matrix_from_arr(a, b: np.array):
     """
     Returns matrix R such that a*R = b.
     """
-    if np.linalg.norm(b) == 0:
+    if np.linalg.norm(b) == 0 or np.allclose(a, b):
         return np.eye(3)
     if np.linalg.norm(b) < 0.99 or np.linalg.norm(b) > 1.01:
         raise ValueError("b must be a unit vector")

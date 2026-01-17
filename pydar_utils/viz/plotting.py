@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
-from set_config import log
+from logging import getLogger
+log = getLogger()
 
 
 def plot_dist_dist(pcd,distances=None):
@@ -51,3 +52,11 @@ def histogram(feature, feat_name='Feature'):
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.tight_layout()
     plt.show()
+
+def plot_neighbor_distribution(pcd):
+    log.info(f'Computing KNN distance')
+    distances = pcd.compute_nearest_neighbor_distance()
+    avg_dist = np.mean(distances)
+    print(f'{avg_dist=}')
+    plot_dist_dist(pcd,distances)
+    return distances, avg_dist

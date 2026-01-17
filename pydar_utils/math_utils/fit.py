@@ -4,7 +4,9 @@ import open3d as o3d
 from sklearn.cluster import  KMeans
 import pyransac3d as pyrsc
 
-from set_config import config, log
+from logging import getLogger
+log = getLogger(__name__)
+
 from .general import (get_radius, 
                     get_center, 
                     rotation_matrix_from_arr,
@@ -53,7 +55,9 @@ def orientation_from_norms(norms, samples=10, max_iter=100):
     while found < samples and iter_num < max_iter and len(norms) > 1:
         iter_num += 1
         rand_id = np.random.randint(len(norms) - 1)
-        norms, vect = poprow(norms, rand_id)
+        # pop random row from norms
+        vect = norms[rand_id]
+        norms = np.vstack((norms[:rand_id], norms[rand_id + 1 :]))
         dot_products = abs(np.dot(norms, vect))
         most_normal_val = min(dot_products)
         if most_normal_val <= 0.001:

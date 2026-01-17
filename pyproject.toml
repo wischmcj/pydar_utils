@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pydar_utils"
-version = "0.1.0"
+version = "0.0.2"
 description = "Python Utilities for TLS LiDAR Scans of Trees"
 readme = "README.md"
-license = {text = "Mozilla Public License Version 2.0"}
+license-files = ["LICENSE.txt"]
 authors = [
-    {name = "pydar_utils Contributors"}
+    {name = "Collin Wischmeyer"}
 ]
 maintainers = [
-    {name = "pydar_utils Contributors"}
+    {name = "Collin Wischmeyer"}
 ]
 keywords = [
     "lidar", "point-cloud", "tree-analysis", "forestry", "3d-processing",
@@ -21,7 +21,6 @@ keywords = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
@@ -67,21 +66,18 @@ all = [
 [project.urls]
 Homepage = "https://github.com/wischmcj/pydar_utils"
 Documentation = "https://pydar_utils.readthedocs.io/"
-Repository = "https://github.com/your-username/pydar_utils.git"
-Issues = "https://github.com/your-username/pydar_utils/issues"
+Repository = "https://github.com/wischmcj/pydar_utils.git"
+Issues = "https://github.com/wischmcj/pydar_utils/issues"
 
-[project.scripts]
-pydar_utils-tree-isolation = "pydar_utils.tree_isolation:main"
-pydar_utils-qsm-generation = "pydar_utils.qsm_generation:main"
-pydar_utils-canopy-metrics = "pydar_utils.canopy_metrics:main"
+# [project.scripts]
+# pydar_utils-tree-isolation = "pydar_utils.tree_isolation:main"
+# pydar_utils-qsm-generation = "pydar_utils.qsm_generation:main"
+# pydar_utils-canopy-metrics = "pydar_utils.canopy_metrics:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["pydar_utils*"]
 exclude = ["tests*", "scripts*", "docs*"]
-
-[tool.setuptools.package-data]
-pydar_utils = ["pydar_utils_config.toml"]
 
 [tool.black]
 line-length = 88
@@ -126,45 +122,45 @@ module = [
 ]
 ignore_missing_imports = true
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    "--cov=pydar_utils",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
-]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-]
+# [tool.pytest.ini_options]
+# testpaths = ["tests"]
+# python_files = ["test_*.py", "*_test.py"]
+# python_classes = ["Test*"]
+# python_functions = ["test_*"]
+# addopts = [
+#     "--strict-markers",
+#     "--strict-config",
+#     "--cov=pydar_utils",
+#     "--cov-report=term-missing",
+#     "--cov-report=html",
+#     "--cov-report=xml",
+# ]
+# markers = [
+#     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+#     "integration: marks tests as integration tests",
+#     "unit: marks tests as unit tests",
+# ]
 
-[tool.coverage.run]
-source = ["pydar_utils"]
-omit = [
-    "*/tests/*",
-    "*/test_*",
-    "*/__pycache__/*",
-    "*/venv/*",
-    "*/newvenv/*",
-]
+# [tool.coverage.run]
+# source = ["pydar_utils"]
+# omit = [
+#     "*/tests/*",
+#     "*/test_*",
+#     "*/__pycache__/*",
+#     "*/venv/*",
+#     "*/newvenv/*",
+# ]
 
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-]
+# [tool.coverage.report]
+# exclude_lines = [
+#     "pragma: no cover",
+#     "def __repr__",
+#     "if self.debug:",
+#     "if settings.DEBUG",
+#     "raise AssertionError",
+#     "raise NotImplementedError",
+#     "if 0:",
+#     "if __name__ == .__main__.:",
+#     "class .*\\bProtocol\\):",
+#     "@(abc\\.)?abstractmethod",
+# ]

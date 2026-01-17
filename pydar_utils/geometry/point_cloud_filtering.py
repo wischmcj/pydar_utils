@@ -2,8 +2,9 @@
 from numpy import array as arr
 import numpy as np 
 import open3d as o3d
-from set_config import config, log
+from logging import getLogger
 
+log = getLogger(__name__)
 def zoom_pcd(zoom_region,
             pcd, 
             reverse=False):

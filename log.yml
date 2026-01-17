@@ -1,0 +1,33 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+
+    default:
+        format: "%(asctime)s.%(msecs)03d |%(threadName)-12s | %(levelname)-7s | %(filename)s:%(lineno)s - %(funcName)20s() | %(name)s - %(message)s"
+        datefmt: "%Y.%m.%d %H:%M:%S"
+
+handlers:
+
+    file:
+        level: 1
+        class: logging.FileHandler
+        filename: ./pydar_utils.log
+        formatter: default
+
+loggers:
+    calc:
+        level: DEBUG
+        handlers: [file]
+        propagate: no
+
+    viz:
+        level: INFO
+        handlers: [file]
+        propagate: yes
+
+root:
+    # By default, we display warning level logs from any library in the console
+    # to match Python's default behavior while formatting logs nicely
+    level: WARNING
+    handlers: [file]
