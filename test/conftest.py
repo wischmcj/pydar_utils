@@ -12,7 +12,7 @@ log = getLogger()
 
 cwd = os.getcwd()
 print(cwd)
-sys.path.append(cwd + "/pydar-utils/")
+sys.path.append(cwd + "/pydar_utils/")
 
 
 # def assert_close(*args):

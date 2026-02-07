@@ -8,14 +8,18 @@ from logging import getLogger
 log = getLogger(__name__)
 
 def get_smoothed_features(all_data, 
+                detail_data=None,
                 save_file=None,
                 profile=False,):
+    if detail_data is None and save_file is None:
+        raise ValueError("get_smoothed_features: one of save_file and detail_data must be provided") 
     points = all_data['points']
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(points)
     smoothed_data = defaultdict(list)
-    smoothed_data_file = save_file.replace('.npz', '_smoothed.npz')
-    detail_data_file = save_file.replace('.npz', '_detail_feats.npz')
+    if save_file is not None:
+        smoothed_data_file = save_file.replace('.npz', '_smoothed.npz')
+        detail_data_file = save_file.replace('.npz', '_detail_feats.npz')
 
     # Check for existing smoothed data
     if os.path.exists(smoothed_data_file):
@@ -26,10 +30,12 @@ def get_smoothed_features(all_data,
         datum_name = 'intensity'
         datum = smoothed_data.get(datum_name)
 
-        detail_file_name = save_file.replace('with_all_feats/','').replace('int_color_data', 'full_ext').replace('.npz', f'_orig_detail.pcd')
+        if save_file is not None:
+            detail_file_name = save_file.replace('with_all_feats/','').replace('int_color_data', 'full_ext').replace('.npz', f'_orig_detail.pcd')
         detail_pcd = o3d.io.read_point_cloud(detail_file_name)
 
-        detail_data_file = save_file.replace('.npz', f'_{datum_name}_detail_feats.npz')
+        if save_file is not None:
+            detail_data_file = save_file.replace('.npz', f'_{datum_name}_detail_feats.npz')
 
         if os.path.exists(detail_data_file):
             final_data = np.load(detail_data_file)['intensity']
@@ -46,7 +52,8 @@ def get_smoothed_features(all_data,
             final_data = []
             for nbr_list in tqdm(nbrs): final_data.append(np.array(np.mean(datum[nbr_list])))
             final_data = np.array(final_data)
-            np.savez_compressed(detail_data_file, intensity = final_data)
+            if save_file is not None:
+                np.savez_compressed(detail_data_file, intensity = final_data)
         np.sort(final_data)
         return final_data, detail_pcd
         

@@ -29,7 +29,8 @@ from sklearn.cluster import KMeans
 from pydar_utils.utils.io import load
 from pydar_utils.viz.plotting import  histogram
 from pydar_utils.utils.io import np_to_o3d
-from pydar_utils.pipeline import loop_over_files, read_and_downsample
+from pipeline import loop_over_files, read_and_downsample
+from open3d.visualization import draw_geometries_with_editing as edit
 
 log = logging.getLogger(__name__)
 
@@ -46,13 +47,14 @@ def identify_epiphytes(file_content, save_gif=False, out_path = '/media/penguama
     log.info('identifying epiphytes')
     # user_input = 65
     # while user_input is not None:
-    seed, pcd, clean_pcd, shift_one = file_content['seed'], file_content['src'], file_content['clean_pcd'], file_content['shift_one']
+    seed, pcd, clean_pcd, shift_one = file_content['seed'], file_content['pcd'], file_content['clean_pcd'], file_content['shift_one']
     assert shift_one is not None # No shifts for this seed; Ensure you pass get_shifts=True to read_pcds_and_feats
     
+    breakpoint()
     orig_colors = deepcopy(arr(clean_pcd.colors))
     c_mag = np.array([np.linalg.norm(x) for x in shift_one])
     
-    highc_idxs, highc,lowc = split_on_percentile(clean_pcd,c_mag,65, color_on_percentile=True)
+    highc_idxs, highc,lowc = split_on_percentile(clean_pcd,c_mag,45, color_on_percentile=True)
     clean_pcd.colors = o3d.utility.Vector3dVector(orig_colors)
     lowc = clean_pcd.select_by_index(highc_idxs, invert=True)
     highc = clean_pcd.select_by_index(highc_idxs, invert=False)
@@ -64,6 +66,7 @@ def identify_epiphytes(file_content, save_gif=False, out_path = '/media/penguama
     z_mag = np.array([x[2] for x in high_shift])
     leaves_idxs, leaves, epis = split_on_percentile(highc,z_mag,60, color_on_percentile=True)
     epis_colored  = highc.select_by_index(leaves_idxs, invert=True)
+    
     # draw([lowc, leaves,epis])
     # draw([epis])
     project_components_in_clusters(pcd, clean_pcd, epis, leaves, lowc, seed)
@@ -510,6 +513,7 @@ def compare_dirs(dir1, dir2,
 
     return in_one_not_two_files, in_one_not_two_keys
 
+
 def crop_and_remove():
     from open3d.visualization import draw_geometries_with_editing as edit
     
@@ -539,6 +543,11 @@ def crop_and_remove():
     new_data = { 'points': to_filter_data['points'], 'colors': to_filter_data['colors'], 'intensity': to_filter_data['intensity'] }
     # np.savez_compressed('/media/penguaman/tosh2b2/lidar_sync/tls_lidar/MonteVerde/EpiphytusTV4color_int_treeiso.npz', **new_data)
     
+def get_total_coverage_voxel_grid(pcd, voxel_size=0.1):
+    voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(pcd, voxel_size=voxel_size)
+    draw([voxel_grid])
+    vox = pcd.voxel_down_sample(0.1)
+    return voxel_grid
 
 
 if __name__ == "__main__":
@@ -555,15 +564,28 @@ if __name__ == "__main__":
     #                         tile_dir = '/media/penguaman/tosh2b2/lidar_sync/tls_lidar/SKIO/',
     #                         tile_pattern = 'SKIO-RaffaiEtAlcolor_int_*.npz', invert=False,
     #                         out_folder='/media/penguaman/tosh2b2/lidar_sync/pyqsm/skio/cluster_joining/detail')
+    # pcd = read_pcd('/media/penguaman/writable/lidar_sync/py_qsm/skio/exts/epis/detail/joined.pcd')
+    
+    # get_total_coverage_voxel_grid(pcd)
+    # breakpoint()
+    # requested_seeds = [
+    #     #'skio_133_tl_1',
+    #                     'skio_193_tl_241',
+    #                     'skio_191_tl_236',
+    #                     # 'skio_189_tl_236'
+    #                     ]
     requested_seeds = ['skio_0_tl_6']
-    base_dir = '/media/penguaman/tosh2b2/lidar_sync/pyqsm/skio/cluster_joining'
+    # base_dir = '/media/penguaman/tosh2b2/lidar_sync/pyqsm/skio/cluster_joining'
+
+                    
+    base_dir = '/media/penguaman/tosh2b/lidar_sync/py_qsm/skio/cluster_joining'
 
     loop_over_files(
                     identify_epiphytes,
                     requested_seeds=requested_seeds,
                     parallel = False,
                     base_dir=base_dir,
-                    data_file_config={ 
+                data_file_config={ 
                         ('pcd','clean_pcd'): {
                                 'folder': 'detail/',
                                 'file_pattern': f'*.npz',

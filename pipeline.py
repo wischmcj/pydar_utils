@@ -5,10 +5,11 @@ from glob import glob
 from joblib import Parallel, delayed
 from collections import defaultdict
 from open3d.io import read_point_cloud as read_pcd
-from utils.io import convert_las, np_to_o3d, load
-from utils.general import list_if
+from pydar_utils.utils.io import convert_las, np_to_o3d, load
+from pydar_utils.utils.general import list_if
 from itertools import product
 from typing import Any
+import open3d as o3d
 
 log = logging.getLogger()
 
@@ -21,6 +22,7 @@ def get_files_by_seed(data_file_config,
         # Get all matchig files
         folder = f'{base_dir}/{file_info["folder"]}'
         file_pattern = file_info['file_pattern']
+    
         files = glob(file_pattern,root_dir=folder)
         # organize files by seed
         for file in files:
@@ -66,12 +68,12 @@ def read_and_downsample(file_path, voxel_size=None, uniform_down_sample=None, **
         pcd = convert_las(file_path)
     else:
         pcd = read_pcd(file_path, **kwargs)
+        clean_pcd = o3d.geometry.PointCloud()
     if voxel_size is not None or uniform_down_sample is not None:
         clean_pcd = get_downsample(pcd=pcd, voxel_size=voxel_size, uniform_down_sample=uniform_down_sample)
-        return pcd, clean_pcd
-    else:
-        return pcd
-
+    
+    return pcd, clean_pcd
+    
 def get_data_from_config(seed_file_info, data_file_config):
     seed_to_content = defaultdict(dict)
     for file_type, file_path in seed_file_info.items():
@@ -82,6 +84,7 @@ def get_data_from_config(seed_file_info, data_file_config):
         load_value = list_if(load_value)
         if len(file_type) != len(load_value):
             raise ValueError(f'length of values returned by {load_func.__name__} ({len(load_value)}) is not equal to the length of the file_type {file_type}')
+        
         for key, value in zip(file_type, load_value):
             seed_to_content[key] = value
             seed_to_content[f'{file_type}_file'] = file_path

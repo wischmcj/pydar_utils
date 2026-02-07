@@ -2,9 +2,9 @@ import numpy as np
 import os 
 from logging import getLogger
 
-from math_utils import get_percentile, get_center, get_radius
+from pydar_utils.math_utils.general import get_percentile, get_center, get_radius
 import open3d as o3d
-from viz import draw
+from pydar_utils.viz.viz_utils import draw
 import matplotlib.pyplot as plt
 
 log = getLogger(__name__)
